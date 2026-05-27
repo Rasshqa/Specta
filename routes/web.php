@@ -25,7 +25,7 @@ Route::get('/', function () {
     $announcements  = \App\Models\Information::where('is_active', true)->latest()->get();
     
     return view('welcome', compact('merchandises', 'eskuls', 'winners', 'timelines', 'docsPreviews', 'announcements'));
-});
+})->name('home');
 
 Route::get('/merch', [MerchController::class, 'index'])->name('merch.index');
 Route::get('/docs', [DocsController::class, 'index'])->name('docs.index');

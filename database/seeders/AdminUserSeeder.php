@@ -18,14 +18,14 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Admin SPECTA XXI',
                 'email'    => 'admin@spectaxxi.sch.id',
-                'password' => Hash::make('specta2025admin'),
+                'password' => Hash::make('specta2026admin'),
                 'role'     => 'admin',
             ]
         );
 
         $this->command->info('✅ Akun admin berhasil dibuat!');
         $this->command->info('   Email   : admin@spectaxxi.sch.id');
-        $this->command->info('   Password: specta2025admin');
+        $this->command->info('   Password: specta2026admin');
         $this->command->warn('   ⚠️  Segera ganti password setelah login pertama!');
     }
 }

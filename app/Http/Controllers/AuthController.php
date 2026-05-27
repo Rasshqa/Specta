@@ -21,7 +21,7 @@ class AuthController extends Controller
             } elseif (Auth::user()->isGatekeeper()) {
                 return redirect()->route('gatekeeper.index');
             }
-            return redirect()->route('tickets.index');
+            return redirect()->route('home');
         }
 
         return view('auth.login');
@@ -33,7 +33,7 @@ class AuthController extends Controller
     public function showRegister()
     {
         if (Auth::check()) {
-            return redirect()->route('tickets.index');
+            return redirect()->route('home');
         }
 
         return view('auth.register');
@@ -59,7 +59,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('tickets.index')->with('success', 'Akun berhasil dibuat. Silakan lanjutkan pembelian tiket.');
+        return redirect()->route('home')->with('success', 'Akun berhasil dibuat.');
     }
 
     /**
@@ -83,8 +83,8 @@ class AuthController extends Controller
                 return redirect()->intended(route('gatekeeper.index'));
             }
 
-            // Normal buyer redirects to tickets index or intended url
-            return redirect()->intended(route('tickets.index'));
+            // Normal buyer redirects to home or intended url
+            return redirect()->intended(route('home'));
         }
 
         return back()->withErrors([
