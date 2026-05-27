@@ -6,71 +6,7 @@
 <div class="min-h-screen bg-slate-950 text-slate-100" x-data="{ sidebarOpen: false }">
 
     {{-- Sidebar --}}
-    <aside
-        id="admin-sidebar"
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/60 flex flex-col shadow-2xl shadow-purple-900/10 transition-transform duration-300"
-        :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
-        x-cloak
-    >
-        {{-- Brand --}}
-        <div class="flex-shrink-0 px-6 py-6 border-b border-slate-800/60">
-            <p class="text-xs text-slate-500 uppercase tracking-widest mb-1">Control Panel</p>
-            <h2 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 tracking-widest">SPECTA XXI</h2>
-            <p class="text-xs text-slate-500 mt-0.5">REVELIORA Admin</p>
-        </div>
-
-        {{-- Navigation --}}
-        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            @php
-                $navItems = [
-                    ['icon'=>'🏠','label'=>'Dashboard','route'=>'admin.dashboard'],
-                    ['icon'=>'📋','label'=>'Transaksi','route'=>'admin.transactions'],
-                    ['icon'=>'🛍️','label'=>'Merchandise','route'=>'admin.merchandises'],
-                ];
-            @endphp
-            @foreach($navItems as $item)
-            <a
-                href="{{ route($item['route']) }}"
-                id="nav-{{ $item['route'] }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
-                    {{ request()->routeIs($item['route'])
-                        ? 'bg-purple-600/30 text-purple-200 border border-purple-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60' }}"
-            >
-                <span class="text-base">{{ $item['icon'] }}</span>
-                {{ $item['label'] }}
-            </a>
-            @endforeach
-        </nav>
-
-        {{-- Footer --}}
-        <div class="flex-shrink-0 px-6 py-5 border-t border-slate-800/60">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button
-                    id="btn-logout"
-                    type="submit"
-                    class="w-full flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
-                >
-                    <span>🚪</span> Keluar
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    {{-- Sidebar overlay (mobile) --}}
-    <div
-        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-        x-show="sidebarOpen"
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        @click="sidebarOpen = false"
-        x-cloak
-    ></div>
+    @include('admin.partials.sidebar')
 
     {{-- Main content --}}
     <div class="lg:pl-64 flex flex-col min-h-screen">
@@ -89,7 +25,7 @@
             </button>
             <div class="flex items-center gap-3 ml-auto">
                 <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <p class="text-sm text-slate-400">{{ auth()->user()->name }}</p>
+                <p class="text-sm text-slate-400 hidden sm:inline">{{ auth()->user()->name }}</p>
                 <div class="w-8 h-8 bg-purple-600/40 border border-purple-500/40 rounded-full flex items-center justify-center text-xs font-bold text-purple-300">
                     {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
@@ -99,35 +35,35 @@
         {{-- Page content --}}
         <main class="flex-1 px-6 py-8">
 
-            {{-- Flash messages --}}
-            @if(session('success'))
-            <div class="mb-6 bg-green-900/40 border border-green-500/40 text-green-300 text-sm px-5 py-4 rounded-2xl flex items-center gap-3">
-                <span>✅</span> {{ session('success') }}
-            </div>
-            @endif
-
-            <div class="mb-8" data-aos="fade-right">
-                <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Dashboard</h1>
-                <p class="text-slate-500 text-sm mt-1">Ringkasan operasional SPECTA XXI: REVELIORA</p>
+            <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4" data-aos="fade-right">
+                <div>
+                    <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Dashboard</h1>
+                    <p class="text-slate-500 text-sm mt-1">Ringkasan operasional SPECTA XXI: REVELIORA</p>
+                </div>
+                <button onclick="window.dispatchEvent(new CustomEvent('open-scanner'))" class="w-full sm:w-auto justify-center bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-all">
+                    <span>📱</span> Scan Tiket QR
+                </button>
             </div>
 
             {{-- Stats grid --}}
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
                 @php
                     $statCards = [
-                        ['label'=>'Total Transaksi','value'=> $stats['total_transactions'],'icon'=>'📊','color'=>'purple'],
-                        ['label'=>'Menunggu Bayar','value'=> $stats['pending_transactions'],'icon'=>'⏳','color'=>'yellow'],
-                        ['label'=>'Terkonfirmasi','value'=> $stats['success_transactions'],'icon'=>'✅','color'=>'green'],
+                        ['label'=>'Transaksi','value'=> $stats['total_transactions'],'icon'=>'📊','color'=>'purple'],
+                        ['label'=>'Pending','value'=> $stats['pending_transactions'],'icon'=>'⏳','color'=>'yellow'],
+                        ['label'=>'Sukses','value'=> $stats['success_transactions'],'icon'=>'✅','color'=>'green'],
                         ['label'=>'Tiket Terjual','value'=> $stats['tickets_sold'],'icon'=>'🎟️','color'=>'cyan'],
+                        ['label'=>'QR Generated','value'=> $stats['qr_generated'],'icon'=>'🎫','color'=>'indigo'],
+                        ['label'=>'QR Scanned','value'=> $stats['qr_scanned'],'icon'=>'📱','color'=>'emerald'],
                     ];
                 @endphp
                 @foreach($statCards as $card)
-                <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-5 hover:border-{{ $card['color'] }}-500/40 transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $loop->index * 80 }}">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-xs text-slate-500 uppercase tracking-widest">{{ $card['label'] }}</p>
-                        <span class="text-xl">{{ $card['icon'] }}</span>
+                <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-4 sm:p-5 hover:border-{{ $card['color'] }}-500/40 transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $loop->index * 80 }}">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <p class="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider sm:tracking-widest">{{ $card['label'] }}</p>
+                        <span class="text-lg sm:text-xl">{{ $card['icon'] }}</span>
                     </div>
-                    <p class="text-3xl font-black text-slate-100">{{ number_format($card['value']) }}</p>
+                    <p class="text-2xl sm:text-3xl font-black text-slate-100">{{ number_format($card['value']) }}</p>
                 </div>
                 @endforeach
             </div>
@@ -177,7 +113,7 @@
                     <a href="{{ route('admin.transactions') }}" id="link-all-transactions" class="text-xs text-purple-400 hover:text-purple-300 font-semibold transition-colors">Lihat Semua →</a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
+                    <table class="w-full text-sm admin-table-card">
                         <thead>
                             <tr class="border-b border-slate-800/60">
                                 <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Invoice</th>
@@ -191,14 +127,14 @@
                         <tbody class="divide-y divide-slate-800/40">
                             @forelse($recentOrders as $order)
                             <tr class="hover:bg-slate-800/30 transition-colors">
-                                <td class="px-6 py-4 font-mono text-xs text-purple-300">{{ $order->invoice_number }}</td>
-                                <td class="px-6 py-4">
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 font-mono text-xs text-purple-300" data-label="Invoice">{{ $order->invoice_number }}</td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4" data-label="Pembeli">
                                     <p class="font-medium text-slate-200">{{ $order->buyer_name }}</p>
                                     <p class="text-xs text-slate-500">{{ $order->buyer_class }}</p>
                                 </td>
-                                <td class="px-6 py-4 text-slate-300">{{ $order->ticket->ticket_name }} ×{{ $order->quantity }}</td>
-                                <td class="px-6 py-4 font-semibold text-slate-200">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
-                                <td class="px-6 py-4">
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 text-slate-300" data-label="Tiket">{{ $order->ticket->ticket_name }} ×{{ $order->quantity }}</td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-200" data-label="Total">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4" data-label="Status">
                                     @php
                                         $badgeMap = [
                                             'pending' => 'bg-yellow-900/40 text-yellow-400 border-yellow-600/40',
@@ -206,11 +142,11 @@
                                             'expired' => 'bg-red-900/40 text-red-400 border-red-600/40',
                                         ];
                                     @endphp
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border {{ $badgeMap[$order->status] ?? '' }}">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold border {{ $badgeMap[$order->status] ?? '' }}">
                                         {{ ucfirst($order->status) }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-4 sm:px-6 py-3 sm:py-4" data-label="Aksi">
                                     @if($order->isPending())
                                     <div class="flex items-center gap-2">
                                         <form method="POST" action="{{ route('admin.transaction.confirm', $order->invoice_number) }}">
@@ -249,5 +185,107 @@
 
         </main>
     </div>
+
+    {{-- Scanner Modal --}}
+    <div x-data="qrScanner()" 
+         @open-scanner.window="openModal()" 
+         x-show="isOpen" 
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm"
+         style="display: none;">
+        
+        <div @click.away="closeModal()" class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+            <button @click="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+            
+            <h2 class="text-xl font-bold mb-2 text-center">Scan Tiket QR</h2>
+            <p class="text-xs text-slate-500 text-center mb-6">Arahkan kamera ke QR Code milik pengunjung.</p>
+            
+            <div id="reader" class="rounded-2xl overflow-hidden border-2 border-slate-700 bg-black aspect-square w-full"></div>
+            
+            <div x-show="message" x-transition class="mt-4 p-4 rounded-xl text-center text-sm font-bold border" :class="isSuccess ? 'bg-green-900/40 text-green-400 border-green-500/30' : 'bg-red-900/40 text-red-400 border-red-500/30'">
+                <span x-text="message"></span>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('qrScanner', () => ({
+        isOpen: false,
+        scanner: null,
+        message: '',
+        isSuccess: false,
+        isScanning: false,
+
+        openModal() {
+            this.isOpen = true;
+            this.message = '';
+            this.startScanner();
+        },
+
+        closeModal() {
+            this.isOpen = false;
+            this.stopScanner();
+        },
+
+        startScanner() {
+            if (this.scanner) return;
+            
+            // Allow small delay for DOM to render
+            setTimeout(() => {
+                this.scanner = new Html5Qrcode("reader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+                
+                this.scanner.start({ facingMode: "environment" }, config, this.onScanSuccess.bind(this))
+                    .catch(err => {
+                        this.message = "Gagal mengakses kamera. Pastikan izin diberikan.";
+                        this.isSuccess = false;
+                    });
+            }, 300);
+        },
+
+        stopScanner() {
+            if (this.scanner) {
+                this.scanner.stop().then(() => {
+                    this.scanner.clear();
+                    this.scanner = null;
+                }).catch(console.error);
+            }
+        },
+
+        onScanSuccess(decodedText) {
+            if (this.isScanning) return; // Prevent multiple scans at once
+            this.isScanning = true;
+            
+            // Tunda scan berikutnya sebentar agar tidak spam
+            setTimeout(() => { this.isScanning = false; }, 3000);
+
+            // Fetch to backend
+            fetch("{{ route('admin.scan') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ code: decodedText })
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.message = data.message;
+                this.isSuccess = data.success;
+                
+                // Jika sukses, mainkan bunyi (opsional) atau update stats
+                if(data.success) {
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(err => {
+                this.message = "Terjadi kesalahan jaringan.";
+                this.isSuccess = false;
+            });
+        }
+    }));
+});
+</script>
 @endsection

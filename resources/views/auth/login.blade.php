@@ -3,66 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login – SPECTA XXI</title>
+    <title>Sign In – SPECTA REVELIORA</title>
     @vite(['resources/css/app.css'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .glow-purple { box-shadow: 0 0 60px rgba(124, 58, 237, 0.15), 0 0 120px rgba(124, 58, 237, 0.05); }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+        }
+        .glow-purple {
+            box-shadow: rgba(186, 131, 255, 0.2) 0px 0px 40px 0px, rgba(186, 131, 255, 0.05) 0px 0px 80px 0px;
+        }
         .grid-bg {
             background-image:
-                linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(rgba(186,131,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(186,131,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-12px) rotate(1deg); }
-            66% { transform: translateY(-6px) rotate(-1deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
         }
         .float { animation: float 6s ease-in-out infinite; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen grid-bg flex items-center justify-center px-4 py-12">
+<body class="text-slate-100 min-h-screen grid-bg flex items-center justify-center px-4 py-12 relative overflow-hidden">
 
-    {{-- Background Glows --}}
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl"></div>
+    {{-- Ambient Universe Glows --}}
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -left-40 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
     </div>
 
-    <div class="relative w-full max-w-md" x-data="{ showPass: false }">
+    <div class="relative w-full max-w-md z-10" x-data="{ showPass: false }">
 
         {{-- Logo / Brand --}}
-        <div class="text-center mb-10 float">
+        <div class="text-center mb-8 float">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 mb-4 shadow-lg shadow-purple-500/30">
-                <span class="text-3xl">🔐</span>
+                <span class="text-3xl">🔑</span>
             </div>
             <h1 class="text-2xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 uppercase">
-                SPECTA XXI
+                REVELIORA
             </h1>
-            <p class="text-slate-500 text-sm mt-1">Admin Control Panel</p>
+            <p class="text-slate-500 text-sm mt-1">Sign In to Your Account</p>
         </div>
 
         {{-- Card --}}
         <div class="bg-slate-900/80 backdrop-blur-2xl border border-slate-800/60 rounded-3xl p-8 shadow-2xl glow-purple">
 
             <h2 class="text-xl font-bold text-slate-100 mb-1">Selamat Datang</h2>
-            <p class="text-slate-500 text-sm mb-8">Login menggunakan akun admin kamu.</p>
-
-            {{-- Error / Success Alerts --}}
-            @if(session('error'))
-            <div class="mb-6 bg-red-900/40 border border-red-500/40 text-red-300 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
-                <span>⚠️</span> {{ session('error') }}
-            </div>
-            @endif
-            @if(session('success'))
-            <div class="mb-6 bg-green-900/40 border border-green-500/40 text-green-300 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
-                <span>✅</span> {{ session('success') }}
-            </div>
-            @endif
+            <p class="text-slate-500 text-sm mb-8">Masuk untuk melanjutkan pembelian tiket.</p>
 
             <form method="POST" action="{{ route('login') }}" class="space-y-5">
                 @csrf
@@ -77,7 +69,7 @@
                         value="{{ old('email') }}"
                         autocomplete="email"
                         autofocus
-                        placeholder="admin@spectaxxi.sch.id"
+                        placeholder="contoh@domain.com"
                         required
                         class="w-full bg-slate-800/60 border @error('email') border-red-500/60 @else border-slate-700/60 @enderror rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-purple-500/80 focus:ring-1 focus:ring-purple-500/30 transition-all text-sm"
                     >
@@ -120,7 +112,7 @@
                         id="remember"
                         type="checkbox"
                         name="remember"
-                        class="w-4 h-4 accent-purple-500 rounded"
+                        class="w-4 h-4 accent-purple-500 rounded bg-slate-900 border-slate-700"
                     >
                     <label for="remember" class="text-sm text-slate-400 select-none cursor-pointer">Ingat saya</label>
                 </div>
@@ -129,11 +121,16 @@
                 <button
                     id="btn-login"
                     type="submit"
-                    class="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-lg shadow-purple-900/30 hover:shadow-purple-500/20 hover:-translate-y-0.5 active:translate-y-0 text-sm tracking-wide"
+                    class="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-purple-900/30 hover:shadow-purple-500/20 hover:-translate-y-0.5 active:translate-y-0 text-sm tracking-wide cursor-pointer"
                 >
-                    Masuk ke Dashboard
+                    Sign In
                 </button>
             </form>
+
+            <div class="mt-6 text-center text-sm">
+                <span class="text-slate-500">Belum punya akun?</span>
+                <a href="{{ route('register') }}" class="text-purple-400 hover:text-cyan-400 font-bold ml-1 transition-colors">Daftar Sekarang</a>
+            </div>
         </div>
 
         <p class="text-center text-slate-600 text-xs mt-6">

@@ -127,43 +127,62 @@
 
                 {{-- Status banners --}}
                 <div x-show="status === 'success'" x-transition
-                     class="bg-green-900/40 border border-green-500/40 rounded-2xl p-6 text-center mb-6 space-y-4">
-                    <div class="text-5xl">✅</div>
-                    <p class="text-green-400 font-bold text-xl">Pembayaran Dikonfirmasi!</p>
+                     class="bg-green-900/40 border border-green-500/40 rounded-2xl p-8 text-center mb-6 space-y-6">
+                    <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center text-3xl mx-auto animate-bounce">
+                        ✅
+                    </div>
+                    <div>
+                        <h2 class="text-green-400 font-black text-2xl tracking-wide">Pembayaran Dikonfirmasi!</h2>
+                        <p class="text-slate-300 text-sm mt-2 leading-relaxed">
+                            Terima kasih! Pembayaran Anda telah kami verifikasi. E-Tiket Anda telah berhasil dibuat.
+                        </p>
+                    </div>
+
                     @if($transaction->status === 'success')
-                    <p class="text-slate-400 text-sm">
-                        E-Tiket kamu sudah siap untuk diunduh!
-                    </p>
-
-                    {{-- PRIMARY: Download Button --}}
-                    <a href="{{ route('ticket.download', $transaction->download_token) }}"
-                       id="btn-download-ticket"
-                       class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-black py-3.5 px-8 rounded-2xl transition-all duration-300 shadow-lg shadow-purple-900/50 hover:shadow-purple-500/30 hover:-translate-y-0.5 active:translate-y-0 text-sm tracking-wide border border-purple-400/30">
-                        <span class="text-xl">📥</span>
-                        Download E-Tiket (PDF)
-                    </a>
-
-                    {{-- SECONDARY: Email note --}}
-                    <p class="text-slate-600 text-xs pt-1">
-                        Salinan juga dikirim ke <span class="text-slate-500">{{ $transaction->buyer_email }}</span>
-                        &nbsp;·&nbsp; Cek folder <em>Spam</em> jika tidak ada di Inbox.
-                    </p>
-
-                    <a href="{{ route('tickets.index') }}"
-                       class="inline-block text-xs text-green-400 hover:text-green-300 border border-green-500/30 hover:border-green-400/60 rounded-xl px-4 py-2 transition-all">
-                        ← Kembali ke Halaman Tiket
-                    </a>
+                    <div class="py-2">
+                        {{-- PRIMARY: Download Button --}}
+                        <a href="{{ route('ticket.download', $transaction->download_token) }}"
+                           id="btn-download-ticket"
+                           class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-black py-4 px-8 rounded-2xl transition-all duration-300 shadow-lg shadow-purple-900/50 hover:shadow-purple-500/30 hover:-translate-y-0.5 active:translate-y-0 text-sm tracking-widest uppercase border border-purple-400/30 w-full justify-center">
+                            <span>📥</span>
+                            Download E-Tiket (PDF)
+                        </a>
+                    </div>
                     @endif
+
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-left space-y-2">
+                        <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Pemberitahuan Penting:</p>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            📧 E-Tiket juga telah dikirimkan ke alamat email Anda: <strong class="text-cyan-400">{{ $transaction->buyer_email }}</strong>. Silakan periksa folder <strong>Kotak Masuk (Inbox)</strong> atau <strong>Spam</strong> Anda secara berkala.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <a href="{{ url('/') }}"
+                           class="flex-1 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 hover:border-purple-500/50 rounded-xl text-xs font-bold uppercase tracking-wider text-purple-300 text-center transition-all">
+                            🏠 Halaman Utama
+                        </a>
+                        <a href="{{ route('tickets.index') }}"
+                           class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700/50 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-300 text-center transition-all">
+                            🎟️ Beli Tiket Lagi
+                        </a>
+                    </div>
                 </div>
 
                 <div x-show="status === 'expired'" x-transition class="bg-red-900/40 border border-red-500/40 rounded-2xl p-6 text-center mb-6 space-y-3">
                     <div class="text-5xl">❌</div>
                     <p class="text-red-400 font-bold text-xl">Transaksi Kedaluwarsa</p>
                     <p class="text-slate-400 text-sm">Waktu pembayaran habis dan kuota tiket telah dikembalikan.</p>
-                    <a href="{{ route('tickets.index') }}"
-                       class="inline-block mt-2 text-xs text-red-300 hover:text-red-200 border border-red-500/30 hover:border-red-400/60 rounded-xl px-4 py-2 transition-all">
-                        Beli Tiket Lagi
-                    </a>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <a href="{{ url('/') }}"
+                           class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700/50 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-300 text-center transition-all">
+                            🏠 Halaman Utama
+                        </a>
+                        <a href="{{ route('tickets.index') }}"
+                           class="flex-1 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 rounded-xl text-xs font-bold uppercase tracking-wider text-white text-center transition-all">
+                            🎟️ Coba Lagi
+                        </a>
+                    </div>
                 </div>
 
                 {{-- Instructions --}}
@@ -249,6 +268,7 @@
                             this.status = data.status;
                             clearInterval(this.pollingInterval);
                             clearInterval(this.countdownInterval);
+                            window.location.reload();
                         }
                     } catch (e) { /* network hiccup, retry next tick */ }
                 }, 10000); // poll every 10 seconds

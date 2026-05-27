@@ -3,23 +3,38 @@
 @section('title', 'Daftar Transaksi – SPECTA XXI')
 
 @section('content')
-<div class="min-h-screen bg-slate-950 text-slate-100 lg:pl-64 flex flex-col">
-    {{-- Topbar (Simplified for subpages) --}}
-    <header class="sticky top-0 z-30 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/40 px-6 py-4 flex items-center gap-4">
-        <a href="{{ route('admin.dashboard') }}" class="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        </a>
-        <h1 class="font-bold text-slate-200">Semua Transaksi</h1>
-    </header>
+<div class="min-h-screen bg-slate-950 text-slate-100" x-data="{ sidebarOpen: false }">
+    {{-- Sidebar --}}
+    @include('admin.partials.sidebar')
+
+    <div class="lg:pl-64 flex flex-col min-h-screen">
+        {{-- Topbar --}}
+        <header class="sticky top-0 z-30 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/40 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button
+                    @click="sidebarOpen = !sidebarOpen"
+                    class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                    aria-label="Toggle Sidebar"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <a href="{{ route('admin.dashboard') }}" class="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors hidden sm:inline-flex" title="Kembali ke Dashboard">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                </a>
+                <h1 class="font-bold text-slate-200">Semua Transaksi</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <p class="text-sm text-slate-400 hidden sm:inline">{{ auth()->user()->name }}</p>
+                <div class="w-8 h-8 bg-purple-600/40 border border-purple-500/40 rounded-full flex items-center justify-center text-xs font-bold text-purple-300">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                </div>
+            </div>
+        </header>
 
     <main class="flex-1 px-6 py-8">
-        {{-- Flash messages --}}
-        @if(session('success'))
-        <div class="mb-6 bg-green-900/40 border border-green-500/40 text-green-300 text-sm px-5 py-4 rounded-2xl flex items-center gap-3">
-            <span>✅</span> {{ session('success') }}
-        </div>
-        @endif
-
         {{-- Filters & Search --}}
         <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-5 mb-6" data-aos="fade-down">
             <form method="GET" action="{{ route('admin.transactions') }}" class="flex flex-col md:flex-row gap-4">
@@ -48,7 +63,7 @@
         {{-- Table --}}
         <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-2xl overflow-hidden" data-aos="fade-up">
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-sm admin-table-card">
                     <thead>
                         <tr class="border-b border-slate-800/60 bg-slate-900/80">
                             <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Invoice & Waktu</th>
@@ -61,11 +76,11 @@
                     <tbody class="divide-y divide-slate-800/40">
                         @forelse($transactions as $trx)
                         <tr class="hover:bg-slate-800/30 transition-colors">
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4" data-label="Invoice">
                                 <p class="font-mono text-sm text-purple-300 font-bold">{{ $trx->invoice_number }}</p>
                                 <p class="text-xs text-slate-500 mt-1">{{ $trx->created_at->format('d M Y, H:i') }}</p>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4" data-label="Pembeli">
                                 <p class="font-semibold text-slate-200">{{ $trx->buyer_name }} <span class="text-xs text-slate-500 font-normal ml-1">({{ $trx->buyer_class }})</span></p>
                                 <p class="text-xs text-slate-400 mt-0.5">{{ $trx->buyer_email }}</p>
                                 <p class="text-xs text-green-400/80 mt-0.5 flex items-center gap-1">
@@ -73,12 +88,12 @@
                                     {{ $trx->buyer_whatsapp }}
                                 </p>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4" data-label="Pesanan">
                                 <p class="text-sm font-semibold text-cyan-300">{{ $trx->ticket->ticket_name }} <span class="text-slate-300 ml-1">×{{ $trx->quantity }}</span></p>
                                 <p class="text-sm font-bold text-slate-200 mt-1">Rp {{ number_format($trx->total_price, 0, ',', '.') }}</p>
                                 <p class="text-xs text-yellow-400 mt-0.5">Kode: {{ $trx->unique_code }}</p>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4" data-label="Status">
                                 @php
                                     $badgeMap = [
                                         'pending' => 'bg-yellow-900/40 text-yellow-400 border-yellow-600/40',
@@ -90,16 +105,16 @@
                                     {{ ucfirst($trx->status) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4" data-label="Aksi">
                                 @if($trx->isPending())
-                                <div class="flex flex-col gap-2 w-max">
+                                <div class="flex flex-col gap-2 w-full md:w-max md:ml-auto">
                                     <form method="POST" action="{{ route('admin.transaction.confirm', $trx->invoice_number) }}">
                                         @csrf
-                                        <button class="w-full text-xs bg-green-600/20 text-green-400 border border-green-600/30 hover:bg-green-600/40 px-3 py-1.5 rounded-lg transition-all" onclick="return confirm('Konfirmasi pembayaran {{ $trx->invoice_number }}?')">✅ Confirm</button>
+                                        <button class="w-full text-xs bg-green-600/20 text-green-400 border border-green-600/30 hover:bg-green-600/40 px-3 py-1.5 rounded-lg transition-all cursor-pointer" onclick="return confirm('Konfirmasi pembayaran {{ $trx->invoice_number }}?')">✅ Confirm</button>
                                     </form>
                                     <form method="POST" action="{{ route('admin.transaction.expire', $trx->invoice_number) }}">
                                         @csrf
-                                        <button class="w-full text-xs bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/40 px-3 py-1.5 rounded-lg transition-all" onclick="return confirm('Tandai expired?')">❌ Expire</button>
+                                        <button class="w-full text-xs bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/40 px-3 py-1.5 rounded-lg transition-all cursor-pointer" onclick="return confirm('Tandai expired?')">❌ Expire</button>
                                     </form>
                                 </div>
                                 @elseif($trx->isSuccess())
@@ -132,5 +147,6 @@
             @endif
         </div>
     </main>
+    </div>
 </div>
 @endsection

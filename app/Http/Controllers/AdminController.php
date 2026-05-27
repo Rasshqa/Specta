@@ -25,6 +25,8 @@ class AdminController extends Controller
             'scanned_today'        => TicketCode::where('is_scanned', true)
                                         ->whereDate('scanned_at', today())
                                         ->count(),
+            'qr_generated'         => TicketCode::count(),
+            'qr_scanned'           => TicketCode::where('is_scanned', true)->count(),
         ];
 
         $tickets       = Ticket::all();
@@ -120,7 +122,123 @@ class AdminController extends Controller
         return view('admin.merchandises', compact('merchandises'));
     }
 
+    public function merchandiseStore(Request $request)
+    {
+        $data = $request->validate([
+            'name'        => 'required|string|max:150',
+            'description' => 'required|string',
+            'price'       => 'required|numeric|min:0',
+            'stock'       => 'nullable|integer|min:0',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $this->saveWebP($request->file('image'), 'merch');
+        }
+        unset($data['stock']); // stock not in table, ignore
+
+        Merchandise::create($data);
+
+        return back()->with('success', 'Merchandise berhasil ditambahkan.');
+    }
+
+    public function merchandiseUpdate(Request $request, Merchandise $merchandise)
+    {
+        $data = $request->validate([
+            'name'        => 'required|string|max:150',
+            'description' => 'required|string',
+            'price'       => 'required|numeric|min:0',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($merchandise->image) \Storage::disk('public')->delete($merchandise->image);
+            $data['image'] = $this->saveWebP($request->file('image'), 'merch');
+        } else {
+            unset($data['image']);
+        }
+
+        $merchandise->update($data);
+
+        return back()->with('success', 'Merchandise berhasil diperbarui.');
+    }
+
+    public function merchandiseDestroy(Merchandise $merchandise)
+    {
+        $merchandise->delete();
+
+        return back()->with('success', 'Merchandise berhasil dihapus.');
+    }
+
     // -----------------------------------------------------------------------
     // PRIVATE HELPERS
     // -----------------------------------------------------------------------
+
+    public function scanQr(Request $request)
+    {
+        $request->validate(['code' => 'required|string']);
+
+        $ticketCode = TicketCode::where('unique_ticket_code', $request->code)->first();
+
+        if (!$ticketCode) {
+            return response()->json([
+                'success' => false,
+                'message' => 'QR Code tidak valid atau bukan dari aplikasi ini!'
+            ], 404);
+        }
+
+        if ($ticketCode->is_scanned) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tiket sudah pernah di-scan pada ' . $ticketCode->scanned_at->format('d M Y H:i')
+            ], 400);
+        }
+
+        $ticketCode->update([
+            'is_scanned' => true,
+            'scanned_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket berhasil di-scan! (Invoice: ' . $ticketCode->transaction->invoice_number . ')'
+        ]);
+    }
+
+    private function saveWebP($file, string $folder): string
+    {
+        $ext   = strtolower($file->getClientOriginalExtension());
+        $name  = time() . '_' . uniqid() . '.webp';
+        $dest  = $folder . '/' . $name;
+
+        if ($ext === 'webp') {
+            $file->storeAs($folder, $name, 'public');
+            return $dest;
+        }
+
+        $image = match ($ext) {
+            'jpg', 'jpeg' => imagecreatefromjpeg($file->getRealPath()),
+            'png'         => (function ($f) {
+                $img = imagecreatefrompng($f->getRealPath());
+                imagepalettetotruecolor($img);
+                imagealphablending($img, true);
+                imagesavealpha($img, true);
+                return $img;
+            })($file),
+            default       => null,
+        };
+
+        if (!$image) {
+            $file->storeAs($folder, $name, 'public');
+            return $dest;
+        }
+
+        ob_start();
+        imagewebp($image, null, 82);
+        $bytes = ob_get_clean();
+        imagedestroy($image);
+
+        \Storage::disk('public')->put($dest, $bytes);
+        return $dest;
+    }
 }
