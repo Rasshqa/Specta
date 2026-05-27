@@ -12,6 +12,7 @@ use App\Models\EskulProfile;
 use App\Models\Winner;
 use App\Models\Timeline;
 use App\Models\Documentation;
+use App\Http\Controllers\MerchController;
 use App\Http\Controllers\DocsController;
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
@@ -24,7 +25,6 @@ Route::get('/', function () {
     return view('welcome', compact('merchandises', 'eskuls', 'winners', 'timelines', 'docsPreviews'));
 });
 
-use App\Http\Controllers\MerchController;
 Route::get('/merch', [MerchController::class, 'index'])->name('merch.index');
 Route::get('/docs', [DocsController::class, 'index'])->name('docs.index');
 
