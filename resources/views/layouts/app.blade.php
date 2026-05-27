@@ -6,6 +6,7 @@
     <meta name="description" content="SPECTA XXI: REVELIORA — Perayaan seni, budaya, dan kreativitas terbesar SMAN 1 Cianjur. Celestial Treasure.">
     <meta name="theme-color" content="#020617">
     <title>@yield('title', 'SPECTA XXI: REVELIORA – Celestial Treasure')</title>
+    <link rel="icon" href="{{ asset('images/smansa-logo.png') }}" type="image/png">
 
     {{-- Vite: Tailwind CSS & JS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])

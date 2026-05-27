@@ -48,18 +48,12 @@ class DatabaseSeeder extends Seeder
         // TICKETS
         // -------------------------------------------------------
         Ticket::create([
-            'ticket_name'     => 'Presale 1',
-            'price'           => 50000,
-            'quota'           => 500,
-            'remaining_quota' => 500,
+            'ticket_name'     => 'Tiket Biasa',
+            'price'           => 65000,
+            'quota'           => 600,
+            'remaining_quota' => 600,
         ]);
 
-        Ticket::create([
-            'ticket_name'     => 'VIP',
-            'price'           => 100000,
-            'quota'           => 100,
-            'remaining_quota' => 100,
-        ]);
 
         // -------------------------------------------------------
         // MERCHANDISES — 2 placeholder items

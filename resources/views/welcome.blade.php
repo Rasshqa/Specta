@@ -32,9 +32,7 @@
             
             <!-- Left Logo -->
             <a href="#" class="flex items-center gap-3 group focus:outline-none">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:scale-105 transition-all">
-                    SR
-                </div>
+                <img src="{{ asset('images/smansa-logo.png') }}" alt="Logo SMANSA" class="w-10 h-10 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:scale-105 transition-all object-contain">
                 <span class="font-black text-lg tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-purple-300 uppercase">
                     SPECTA REVELIORA
                 </span>
@@ -143,13 +141,14 @@
                 ✨ PREMIUM SCHOOL FESTIVAL 2026 ✨
             </span>
 
-            <!-- Main Heading -->
-            <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter mb-4 text-white uppercase drop-shadow-[0_0_30px_rgba(186,131,255,0.25)] hero-glitch" data-text="SPECTA REVELIORA">
-                SPECTA <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">REVELIORA</span>
-            </h1>
+            <!-- Main Heading Logo -->
+            <div class="mb-8 w-full max-w-4xl mx-auto px-4" data-aos="fade-down">
+                <img src="{{ asset('images/logo_specta.png') }}" alt="SPECTA REVELIORA Logo" class="mx-auto w-full drop-shadow-[0_0_30px_rgba(168,85,247,0.4)]">
+            </div>
+
 
             <!-- Subtitle -->
-            <h2 class="text-lg md:text-2xl font-bold tracking-[0.3em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-yellow-200 to-slate-300 mb-8 hero-neon">
+            <h2 class="text-lg md:text-2xl font-bold tracking-[0.3em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-300 to-purple-400 mb-8 hero-neon">
                 Where Magic Meets Reality
             </h2>
 
@@ -184,7 +183,7 @@
             </div>
 
             <!-- Counter Stats -->
-            <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-20 pt-10 border-t border-white/5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4 max-w-xl mx-auto mt-20 pt-10 border-t border-white/5">
                 <div>
                     <p class="text-3xl md:text-4xl font-black text-white">4</p>
                     <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Guest Stars</p>
@@ -367,6 +366,37 @@
 
         </div>
     </section>
+
+    <!-- ─── ANNOUNCEMENT SECTION ─── -->
+    @if(isset($announcements) && $announcements->isNotEmpty())
+    <section class="py-16 relative z-10 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <span class="text-xs font-bold text-cyan-400 uppercase tracking-[0.25em] block mb-3">LATEST UPDATES</span>
+                <h2 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 uppercase">
+                    Pengumuman Resmi
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($announcements as $announcement)
+                <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl hover:border-purple-500/40 transition-all duration-300 flex flex-col" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                    <div class="mb-4 flex items-center justify-between">
+                        <span class="inline-block px-3 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 text-[10px] font-bold uppercase tracking-widest rounded-md">
+                            {{ $announcement->category }}
+                        </span>
+                        <span class="text-xs text-slate-500 font-mono">{{ $announcement->created_at->format('d M Y') }}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-100 mb-3 leading-tight">{{ $announcement->title }}</h3>
+                    <div class="text-sm text-slate-400 leading-relaxed">
+                        {!! nl2br(e($announcement->content)) !!}
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
 
     <!-- ─── PUSAT INFORMASI (INFORMATION CENTER) ─── -->
     <section id="lore" :class="selectedEskul !== null ? 'z-50' : 'z-10'" class="py-16 md:py-24 relative border-t border-white/5" x-data="{ infoTab: $persist('eskul'), selectedEskul: null, loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
@@ -836,7 +866,7 @@
 
             <!-- Bento Grid: Dynamic if docs exist, else static placeholders -->
             @if($docsPreviews->isNotEmpty())
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]" x-data="{}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]" x-data="{}">
                 @foreach($docsPreviews as $i => $doc)
                 @php
                     $spans = [
@@ -882,7 +912,7 @@
             </div>
             @else
             <!-- Static placeholders -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
                 @php $placeholders = [
                     ['emoji'=>'📸','label'=>'Malam Puncak SPECTA','sub'=>'Kemeriahan yang tak terlupakan','span'=>'md:col-span-2 md:row-span-2','color'=>'hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]','bg'=>'from-slate-800 to-slate-900'],
                     ['emoji'=>'🎸','label'=>'Live Performance','sub'=>'Penampilan band & artis','span'=>'','color'=>'hover:border-purple-500/50 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]','bg'=>'from-purple-950/60 to-slate-900'],
@@ -979,9 +1009,7 @@
     <footer class="bg-black py-12 border-t border-white/5 relative z-10">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <div class="flex items-center justify-center gap-3 mb-6">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center font-bold text-white text-xs">
-                    SR
-                </div>
+                <img src="{{ asset('images/smansa-logo.png') }}" alt="Logo SMANSA" class="w-8 h-8 rounded-lg object-contain">
                 <span class="font-black text-sm tracking-[0.2em] text-slate-300 uppercase">
                     SPECTA REVELIORA
                 </span>
@@ -1096,6 +1124,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        // Prevent browser from remembering scroll position on reload
+        if (!window.location.hash) {
+            window.scrollTo(0, 0);
+        }
+        
         // Inisialisasi Vanilla-Tilt pada elemen berkemampuan tilt
         if (typeof VanillaTilt !== 'undefined') {
             VanillaTilt.init(document.querySelectorAll("[data-tilt]"));

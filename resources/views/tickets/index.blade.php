@@ -17,9 +17,7 @@
             
             <!-- Left Logo -->
             <a href="{{ url('/') }}" class="flex items-center gap-3 group focus:outline-none">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:scale-105 transition-all">
-                    SR
-                </div>
+                <img src="{{ asset('images/smansa-logo.png') }}" alt="Logo SMANSA" class="w-10 h-10 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:scale-105 transition-all object-contain">
                 <span class="font-black text-lg tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-purple-300 uppercase">
                     SPECTA REVELIORA
                 </span>
@@ -131,9 +129,10 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                @foreach($tickets as $ticket)
-                <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-[0_8px_32px_0_rgba(186,131,255,0.03)] hover:border-[#ba83ff]/40 transition-all duration-300 flex flex-col" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+            <div class="max-w-xl mx-auto">
+                @php $ticket = $tickets->first(); @endphp
+                @if($ticket)
+                <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-[0_8px_32px_0_rgba(186,131,255,0.03)] hover:border-[#ba83ff]/40 transition-all duration-300 flex flex-col" data-aos="fade-up">
                     
                     <div class="mb-6">
                         <span class="inline-block px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-widest mb-4">
@@ -165,18 +164,12 @@
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Asal / Kelas</label>
-                                <input type="text" name="buyer_class" required value="{{ old('buyer_class') }}" placeholder="XII MIPA 3 / Umum" class="w-full bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-purple-500/50 transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jumlah</label>
-                                <div class="flex items-center bg-slate-800/60 border border-slate-700/60 rounded-xl overflow-hidden">
-                                    <button type="button" @click="quantity > 1 ? quantity-- : null" class="px-4 py-3 text-slate-400 hover:text-purple-400 hover:bg-slate-700 transition-colors cursor-pointer">-</button>
-                                    <input type="number" name="quantity" min="1" max="5" x-model="quantity" readonly class="w-full bg-transparent text-center text-sm text-slate-200 focus:outline-none pointer-events-none">
-                                    <button type="button" @click="quantity < 5 && quantity < {{ $ticket->remaining_quota }} ? quantity++ : null" class="px-4 py-3 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 transition-colors cursor-pointer">+</button>
-                                </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jumlah</label>
+                            <div class="flex items-center bg-slate-800/60 border border-slate-700/60 rounded-xl overflow-hidden">
+                                <button type="button" @click="quantity > 1 ? quantity-- : null" class="px-4 py-3 text-slate-400 hover:text-purple-400 hover:bg-slate-700 transition-colors cursor-pointer">-</button>
+                                <input type="number" name="quantity" min="1" max="5" x-model="quantity" readonly class="w-full bg-transparent text-center text-sm text-slate-200 focus:outline-none pointer-events-none">
+                                <button type="button" @click="quantity < 5 && quantity < {{ $ticket->remaining_quota }} ? quantity++ : null" class="px-4 py-3 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 transition-colors cursor-pointer">+</button>
                             </div>
                         </div>
                         
@@ -185,7 +178,11 @@
                         </button>
                     </form>
                 </div>
-                @endforeach
+                @else
+                <div class="text-center p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl">
+                    <p class="text-slate-400 text-lg">Mohon maaf, tiket belum tersedia saat ini.</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>

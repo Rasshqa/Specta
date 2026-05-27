@@ -6,9 +6,7 @@
     <nav class="fixed w-full z-[100] top-0 transition-all duration-300 bg-slate-950/80 backdrop-blur-md border-b border-white/10">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="/" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg group-hover:scale-105 transition-transform">
-                    SR
-                </div>
+                <img src="{{ asset('images/smansa-logo.png') }}" alt="Logo SMANSA" class="w-10 h-10 rounded-xl shadow-lg group-hover:scale-105 transition-transform object-contain">
                 <span class="font-black text-xl tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 uppercase hidden sm:block">
                     SPECTA XXI
                 </span>
@@ -82,9 +80,7 @@
     <footer class="bg-black py-12 border-t border-white/5 relative z-10">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <div class="flex items-center justify-center gap-3 mb-6">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center font-bold text-white text-xs">
-                    SR
-                </div>
+                <img src="{{ asset('images/smansa-logo.png') }}" alt="Logo SMANSA" class="w-8 h-8 rounded-lg object-contain">
                 <span class="font-black text-sm tracking-[0.2em] text-slate-300 uppercase">
                     SPECTA REVELIORA
                 </span>

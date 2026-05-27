@@ -21,7 +21,6 @@ class Transaction extends Model
         'buyer_name',
         'buyer_email',
         'buyer_whatsapp',
-        'buyer_class',
         'quantity',
         'base_price',
         'unique_code',

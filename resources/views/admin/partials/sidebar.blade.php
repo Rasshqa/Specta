@@ -41,6 +41,7 @@
         </div>
         @php
             $infoItems = [
+                ['icon'=>'📢','label'=>'Pengumuman','route'=>'admin.informations.index'],
                 ['icon'=>'🎟️','label'=>'Eskul SMANSA','route'=>'admin.infocenter.eskul'],
                 ['icon'=>'🏆','label'=>'Pemenang Lomba','route'=>'admin.infocenter.winners'],
                 ['icon'=>'📸','label'=>'Dokumentasi','route'=>'admin.infocenter.docs'],

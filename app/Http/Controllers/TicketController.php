@@ -41,14 +41,11 @@ class TicketController extends Controller
         // 1. Validate incoming request data
         // ----------------------------------------------------------
         $validated = $request->validate([
-            'ticket_id'      => ['required', 'integer', Rule::exists('tickets', 'id')],
             'buyer_name'     => ['required', 'string', 'max:100'],
             'buyer_email'    => ['required', 'email', 'max:150'],
             'buyer_whatsapp' => ['required', 'string', 'min:9', 'max:20', 'regex:/^(\+62|62|0)[0-9]{8,15}$/'],
-            'buyer_class'    => ['required', 'string', 'max:20'],
             'quantity'       => ['required', 'integer', 'min:1', 'max:5'],
         ], [
-            'ticket_id.exists'       => 'Jenis tiket yang dipilih tidak ditemukan.',
             'buyer_whatsapp.regex'   => 'Format nomor WhatsApp tidak valid (contoh: 081234567890).',
             'quantity.max'           => 'Maksimal pembelian adalah 5 tiket per transaksi.',
         ]);
@@ -59,9 +56,16 @@ class TicketController extends Controller
         try {
             $transaction = DB::transaction(function () use ($validated): Transaction {
 
-                // Lock the ticket row to prevent race conditions
+                // Lock the single "Tiket Biasa" row to prevent race conditions
                 /** @var Ticket $ticket */
-                $ticket = Ticket::lockForUpdate()->findOrFail($validated['ticket_id']);
+                $ticket = Ticket::where('ticket_name', 'Tiket Biasa')->lockForUpdate()->first();
+                if (!$ticket) {
+                    $ticket = Ticket::lockForUpdate()->first(); // Fallback if name differs
+                }
+
+                if (!$ticket) {
+                    throw new \RuntimeException("Tidak ada tiket yang aktif saat ini.");
+                }
 
                 // 3. Quota check
                 if (! $ticket->hasAvailableQuota($validated['quantity'])) {
@@ -91,7 +95,6 @@ class TicketController extends Controller
                     'buyer_name'     => $validated['buyer_name'],
                     'buyer_email'    => $validated['buyer_email'],
                     'buyer_whatsapp' => $validated['buyer_whatsapp'],
-                    'buyer_class'    => $validated['buyer_class'],
                     'quantity'       => $validated['quantity'],
                     'base_price'     => $basePrice,
                     'unique_code'    => $uniqueCode,
@@ -190,6 +193,21 @@ class TicketController extends Controller
         return $code;
     }
     /**
+     * Encode a local image file to a base64 data URI string for DomPDF embedding.
+     *
+     * @param  string $path   Absolute path to the image file.
+     * @param  string $mime   MIME type (e.g. 'image/png', 'image/jpeg').
+     * @return string         Base64 data URI or empty string if file not found.
+     */
+    private function imageToBase64(string $path, string $mime = 'image/png'): string
+    {
+        if (!file_exists($path)) {
+            return '';
+        }
+        return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+    }
+
+    /**
      * Securely stream a PDF e-ticket for download using a UUID download token.
      *
      * The token is non-guessable (UUID v4) and tied to the transaction.
@@ -217,14 +235,33 @@ class TicketController extends Controller
             abort(500, 'Kode tiket belum di-generate. Hubungi panitia.');
         }
 
-        // 5. Render PDF and stream to browser
-        $pdf = Pdf::loadView('tickets.pdf', compact('transaction'))
-            ->setPaper('A4', 'portrait')
+        // 5. Pre-encode logos to base64 so DomPDF can render them
+        $smansaLogoBase64 = $this->imageToBase64(public_path('images/smansa-logo.png'));
+        $spectaLogoBase64 = $this->imageToBase64(public_path('images/logo_specta.png'));
+
+        // 6. Pre-generate QR code base64 strings for each ticket code
+        $qrCodeMap = [];
+        foreach ($transaction->ticketCodes as $ticketCode) {
+            $svgContent = QrCode::format('svg')
+                ->size(110)
+                ->margin(0)
+                ->generate($ticketCode->unique_ticket_code);
+            $qrCodeMap[$ticketCode->id] = 'data:image/svg+xml;base64,' . base64_encode($svgContent);
+        }
+
+        // 7. Render PDF and stream to browser
+        $pdf = Pdf::loadView('tickets.pdf', compact(
+            'transaction',
+            'smansaLogoBase64',
+            'spectaLogoBase64',
+            'qrCodeMap'
+        ))
+            ->setPaper(array(0, 0, 450, 800))
             ->setOptions([
-                'defaultFont'  => 'DejaVu Sans',
-                'isRemoteEnabled' => false,
-                'isHtml5ParserEnabled' => true,
-                'dpi' => 150,
+                'defaultFont'         => 'Helvetica',
+                'isRemoteEnabled'     => true,
+                'isHtml5ParserEnabled'=> true,
+                'dpi'                 => 96,
             ]);
 
         $filename = 'E-Tiket-SPECTA-XXI-' . $transaction->invoice_number . '.pdf';

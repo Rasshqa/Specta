@@ -64,10 +64,7 @@
                         <span class="text-slate-500 text-xs uppercase">Nama</span>
                         <span class="text-slate-200 font-semibold text-right" x-text="result?.data?.buyer_name"></span>
                     </div>
-                    <div class="flex justify-between border-b border-slate-700/50 pb-2">
-                        <span class="text-slate-500 text-xs uppercase">Kelas</span>
-                        <span class="text-slate-200 font-semibold text-right" x-text="result?.data?.buyer_class"></span>
-                    </div>
+
                     <div class="flex justify-between border-b border-slate-700/50 pb-2">
                         <span class="text-slate-500 text-xs uppercase">Tiket</span>
                         <span class="text-cyan-400 font-bold text-right" x-text="result?.data?.ticket_name"></span>

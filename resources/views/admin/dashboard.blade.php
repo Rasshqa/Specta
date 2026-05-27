@@ -130,7 +130,6 @@
                                 <td class="px-4 sm:px-6 py-3 sm:py-4 font-mono text-xs text-purple-300" data-label="Invoice">{{ $order->invoice_number }}</td>
                                 <td class="px-4 sm:px-6 py-3 sm:py-4" data-label="Pembeli">
                                     <p class="font-medium text-slate-200">{{ $order->buyer_name }}</p>
-                                    <p class="text-xs text-slate-500">{{ $order->buyer_class }}</p>
                                 </td>
                                 <td class="px-4 sm:px-6 py-3 sm:py-4 text-slate-300" data-label="Tiket">{{ $order->ticket->ticket_name }} ×{{ $order->quantity }}</td>
                                 <td class="px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-200" data-label="Total">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
@@ -201,6 +200,12 @@
             
             <div id="reader" class="rounded-2xl overflow-hidden border-2 border-slate-700 bg-black aspect-square w-full"></div>
             
+            {{-- Manual Input Fallback --}}
+            <form @submit.prevent="processManualCode()" class="mt-4 flex gap-2">
+                <input type="text" x-model="manualCode" placeholder="Ketik kode (Contoh: TRX-XXX)" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 font-mono uppercase transition-all">
+                <button type="submit" class="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-bold transition-colors text-sm shadow-lg shadow-purple-900/20">Cek</button>
+            </form>
+            
             <div x-show="message" x-transition class="mt-4 p-4 rounded-xl text-center text-sm font-bold border" :class="isSuccess ? 'bg-green-900/40 text-green-400 border-green-500/30' : 'bg-red-900/40 text-red-400 border-red-500/30'">
                 <span x-text="message"></span>
             </div>
@@ -217,10 +222,12 @@ document.addEventListener('alpine:init', () => {
         message: '',
         isSuccess: false,
         isScanning: false,
+        manualCode: '',
 
         openModal() {
             this.isOpen = true;
             this.message = '';
+            this.manualCode = '';
             this.startScanner();
         },
 
@@ -252,6 +259,12 @@ document.addEventListener('alpine:init', () => {
                     this.scanner = null;
                 }).catch(console.error);
             }
+        },
+
+        processManualCode() {
+            if (!this.manualCode.trim() || this.isScanning) return;
+            this.onScanSuccess(this.manualCode.trim().toUpperCase());
+            this.manualCode = '';
         },
 
         onScanSuccess(decodedText) {

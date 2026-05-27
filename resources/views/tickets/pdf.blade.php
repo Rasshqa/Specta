@@ -2,388 +2,296 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>E-Tiket SPECTA XXI – {{ $transaction->invoice_number }}</title>
+    <title>E-Tiket SPECTA XXI</title>
     <style>
-        /* ── Reset & Baseline ── */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         @page {
-            margin: 0mm;
-            size: A4 portrait;
+            margin: 0px;
+            size: 450px 800px;
         }
-
         body {
-            font-family: 'DejaVu Sans', 'Arial', sans-serif;
-            background-color: #020617;
-            color: #f8fafc;
-            font-size: 11px;
-            width: 210mm;
-            height: 297mm;
-        }
-
-        /* ── Page Wrapper ── */
-        .page {
-            width: 100%;
-            height: 100%;
-            background-color: #020617;
-        }
-
-        /* ── Ticket Card (One ticket per A4 page) ── */
-        .ticket-page {
-            width: 210mm;
-            height: 297mm;
-            position: relative;
-            padding: 30px 40px;
-            page-break-after: always;
-        }
-        .ticket-page:last-child {
-            page-break-after: avoid;
-        }
-
-        /* ── Header Banner ── */
-        .header-banner {
-            width: 100%;
-            background-color: #0f172a;
-            border: 2px solid #7c3aed;
-            border-bottom: 4px solid #06b6d4;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header-banner .event-name {
-            font-size: 28px;
-            font-weight: bold;
+            margin: 0px;
+            padding: 0px;
             color: #ffffff;
-            letter-spacing: 6px;
-            text-transform: uppercase;
+            font-family: 'Helvetica', sans-serif;
         }
-        .header-banner .event-sub {
-            font-size: 13px;
-            color: #22d3ee;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-top: 6px;
-            font-weight: bold;
+        .page {
+            position: relative;
+            width: 450px;
+            height: 800px;
+            overflow: hidden;
+            page-break-after: always;
+            background-color: #0c0a1d;
         }
-        .header-banner .event-org {
-            font-size: 9px;
-            color: #64748b;
-            margin-top: 6px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* ── Seat / Index Indicator ── */
-        .seat-indicator {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .seat-indicator-badge {
-            display: inline-block;
-            background-color: #1e1b4b;
-            border: 1px solid #7c3aed;
-            color: #c084fc;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 6px 16px;
-            border-radius: 30px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* ── Main Layout Table ── */
-        .ticket-main-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        /* ── Left Column: Ticket Details ── */
-        .col-details {
-            width: 58%;
-            vertical-align: top;
-            padding-right: 16px;
-        }
-
-        .detail-card {
-            background-color: #0f172a;
-            border: 2px solid #3b0764;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .detail-row {
-            width: 100%;
-            margin-bottom: 12px;
-            border-collapse: collapse;
-        }
-        .detail-row td {
-            vertical-align: top;
-            padding: 0;
-        }
-        .detail-label {
-            font-size: 8.5px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .detail-value {
-            font-size: 15px;
-            font-weight: bold;
-            color: #f8fafc;
-        }
-        .detail-value.cyan { color: #22d3ee; }
-        .detail-value.purple { color: #a855f7; font-size: 12px; letter-spacing: 1.5px; font-family: monospace; }
-
-        /* Custom subtle divider line */
-        .divider {
-            height: 1px;
-            background-color: #1e293b;
-            margin: 10px 0;
-        }
-
-        /* Unique Code Display Box */
-        .code-box {
-            background-color: #120626;
-            border: 1px dashed #7c3aed;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            margin-top: 14px;
-        }
-        .code-box .code-label {
-            font-size: 8.5px;
-            color: #a78bfa;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .code-box .code-value {
-            font-size: 15px;
-            font-weight: bold;
-            color: #06b6d4;
-            letter-spacing: 4px;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* ── Right Column: QR Code ── */
-        .col-qr {
-            width: 42%;
-            vertical-align: top;
-        }
-        .qr-card {
-            background-color: #0f172a;
-            border: 2px solid #3b0764;
-            border-radius: 12px;
-            padding: 24px 16px;
-            text-align: center;
-            height: 100%;
-        }
-        .qr-image-wrapper {
-            margin-bottom: 16px;
-        }
-        .qr-image-wrapper img {
-            width: 150px;
-            height: 150px;
-            background-color: #ffffff;
-            padding: 8px;
-            border-radius: 8px;
-            border: 3px solid #22d3ee;
-        }
-        .qr-scan-label {
-            font-size: 10px;
-            color: #38bdf8;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
-        }
-        .qr-note {
-            font-size: 9px;
-            color: #64748b;
-            line-height: 1.4;
-        }
-
-        /* ── Valid Badge ── */
-        .valid-badge {
-            display: inline-block;
-            background-color: #064e3b;
-            border: 1px solid #059669;
-            color: #34d399;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 4px 12px;
-            border-radius: 20px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
-
-        /* ── Footer Strip (Anchored at page bottom safely) ── */
-        .footer-strip {
-            position: absolute;
-            bottom: 30px;
-            left: 40px;
-            right: 40px;
-            border-top: 1px solid #1e293b;
-            padding-top: 14px;
-        }
-        .footer-strip-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .footer-strip-table td {
-            vertical-align: middle;
-        }
-        .footer-warn-text {
-            font-size: 9px;
-            color: #64748b;
-            line-height: 1.4;
-            width: 70%;
-        }
-        .footer-warn-text strong {
-            color: #f87171;
-        }
-        .footer-copyright {
-            font-size: 9px;
-            color: #475569;
-            text-align: right;
-            width: 30%;
-            letter-spacing: 0.5px;
+        .page:last-child {
+            page-break-after: avoid;
         }
     </style>
 </head>
 <body>
+
+@foreach($transaction->ticketCodes as $index => $ticketCode)
+
+@php
+    // -----------------------------------------------------------------------
+    // Assets — logo & QR pre-encoded to base64 in Controller.
+    // Fallback: encode inline if controller did not supply the variable.
+    // -----------------------------------------------------------------------
+    $resolvedLogo = $smansaLogoBase64
+        ?? (file_exists(public_path('images/smansa-logo.png'))
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('images/smansa-logo.png')))
+            : '');
+
+    $resolvedSpectaLogo = $spectaLogoBase64
+        ?? (file_exists(public_path('images/logo_specta.png'))
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('images/logo_specta.png')))
+            : '');
+
+    $resolvedQr = $qrCodeMap[$ticketCode->id]
+        ?? 'data:image/svg+xml;base64,' . base64_encode(
+            QrCode::format('svg')->size(110)->margin(0)->generate($ticketCode->unique_ticket_code)
+        );
+@endphp
+
 <div class="page">
 
-    @foreach($transaction->ticketCodes as $index => $ticketCode)
+    {{-- ================================================================
+         DECORATIVE LAYER — accent strips, watermark, card backgrounds
+         All positioned at z-index 0-1 to sit behind content
+    ================================================================ --}}
 
-    @php
-        // Generate QR as base64 PNG/SVG for DomPDF compatibility
-        $qrSvg = QrCode::format('svg')->size(200)->margin(1)->generate($ticketCode->unique_ticket_code);
-        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
-    @endphp
+    {{-- Top accent strip — cyan neon --}}
+    <div style="position: absolute; top: 0; left: 0; width: 450px; height: 4px;
+                background-color: #22d3ee; z-index: 1;"></div>
 
-    {{-- Per-ticket A4 Page --}}
-    <div class="ticket-page">
+    {{-- Secondary thin purple line below cyan --}}
+    <div style="position: absolute; top: 4px; left: 0; width: 450px; height: 1px;
+                background-color: #a855f7; z-index: 1;"></div>
 
-        {{-- Header Banner --}}
-        <div class="header-banner">
-            <div class="event-name">SPECTA XXI</div>
-            <div class="event-sub">REVELIORA – Celestial Treasure</div>
-            <div class="event-org">SMAN 1 Cianjur • E-Tiket Resmi</div>
-        </div>
+    {{-- Bottom accent strip — purple neon --}}
+    <div style="position: absolute; top: 796px; left: 0; width: 450px; height: 4px;
+                background-color: #a855f7; z-index: 1;"></div>
 
-        {{-- Seat/Index Badge --}}
-        <div class="seat-indicator">
-            <span class="seat-indicator-badge">
-                Tiket #{{ $index + 1 }} dari {{ $transaction->quantity }}
-            </span>
-        </div>
+    {{-- Secondary thin cyan line above purple --}}
+    <div style="position: absolute; top: 795px; left: 0; width: 450px; height: 1px;
+                background-color: #22d3ee; z-index: 1;"></div>
 
-        {{-- Main Content --}}
-        <table class="ticket-main-table">
-            <tr>
-                {{-- Left Side: Ticket details --}}
-                <td class="col-details">
-                    <div class="detail-card">
-
-                        {{-- Buyer Name --}}
-                        <table class="detail-row">
-                            <tr>
-                                <td>
-                                    <span class="detail-label">Nama Veloran</span>
-                                    <span class="detail-value">{{ strtoupper($transaction->buyer_name) }}</span>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="divider"></div>
-
-                        {{-- Buyer Class --}}
-                        <table class="detail-row">
-                            <tr>
-                                <td>
-                                    <span class="detail-label">Kelas</span>
-                                    <span class="detail-value">{{ strtoupper($transaction->buyer_class) }}</span>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="divider"></div>
-
-                        {{-- Ticket Category --}}
-                        <table class="detail-row">
-                            <tr>
-                                <td>
-                                    <span class="detail-label">Kategori Tiket</span>
-                                    <span class="detail-value cyan">{{ strtoupper($transaction->ticket->ticket_name) }}</span>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="divider"></div>
-
-                        {{-- Invoice Number --}}
-                        <table class="detail-row">
-                            <tr>
-                                <td>
-                                    <span class="detail-label">Nomor Invoice</span>
-                                    <span class="detail-value purple">{{ $transaction->invoice_number }}</span>
-                                </td>
-                            </tr>
-                        </table>
-
-                        {{-- Unique Ticket Code Box --}}
-                        <div class="code-box">
-                            <span class="code-label">Kode Tiket Unik</span>
-                            <span class="code-value">{{ $ticketCode->unique_ticket_code }}</span>
-                        </div>
-
-                        {{-- Validation Status --}}
-                        <div style="text-align: center;">
-                            <span class="valid-badge">✓ Lunas & Valid</span>
-                        </div>
-
-                    </div>
-                </td>
-
-                {{-- Right Side: QR Code Verification --}}
-                <td class="col-qr">
-                    <div class="qr-card">
-                        <div class="qr-image-wrapper">
-                            <img src="{{ $qrBase64 }}" alt="QR Code Tiket">
-                        </div>
-                        <div class="qr-scan-label">Scan Pintu Masuk</div>
-                        <div class="qr-note">
-                            Tunjukkan QR code ini kepada panitia di gerbang masuk.<br><br>
-                            Satu QR code hanya dapat dipindai <strong>satu kali</strong> untuk akses masuk satu orang.
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        {{-- Footer Strip (Safely nested inside the ticket-page container) --}}
-        <div class="footer-strip">
-            <table class="footer-strip-table">
-                <tr>
-                    <td class="footer-warn-text">
-                        <strong>PENTING:</strong> Dilarang keras menggandakan, menyebarluaskan, atau membagikan e-tiket ini. Panitia tidak bertanggung jawab atas segala bentuk penyalahgunaan tiket.
-                    </td>
-                    <td class="footer-copyright">
-                        © {{ date('Y') }} SPECTA XXI
-                    </td>
-                </tr>
-            </table>
-        </div>
-
+    {{-- Subtle watermark "XXI" in background --}}
+    <div style="position: absolute; top: 620px; left: 240px;
+                font-size: 130px; color: #100e26; font-weight: bold;
+                letter-spacing: 8px; z-index: 0;">
+        XXI
     </div>
 
-    @endforeach
+    {{-- Left edge accent — thin vertical cyan glow --}}
+    <div style="position: absolute; top: 100px; left: 0; width: 2px; height: 600px;
+                background-color: #13112a; z-index: 0;"></div>
+
+    {{-- Right edge accent — thin vertical purple glow --}}
+    <div style="position: absolute; top: 100px; left: 448px; width: 2px; height: 600px;
+                background-color: #13112a; z-index: 0;"></div>
+
+
+    {{-- ================================================================
+         HEADER — Logo SMANSA + Event Title + Ticket Index
+    ================================================================ --}}
+
+    {{-- Logo SMANSA --}}
+    <div style="position: absolute; top: 18px; left: 0; width: 450px;
+                text-align: center; z-index: 2;">
+        @if($resolvedLogo)
+        <img src="{{ $resolvedLogo }}"
+             style="width: 52px; height: 52px;"
+             alt="Logo SMANSA" />
+        @endif
+    </div>
+
+    {{-- Event Title: SPECTA XXI REVELIORA Logo --}}
+    <div style="position: absolute; top: 76px; left: 0; width: 450px;
+                text-align: center; z-index: 2;">
+        @if($resolvedSpectaLogo)
+        <img src="{{ $resolvedSpectaLogo }}"
+             style="height: 46px; width: auto;"
+             alt="Logo SPECTA" />
+        @endif
+    </div>
+
+    {{-- Ticket index --}}
+    <div style="position: absolute; top: 130px; left: 0; width: 450px;
+                text-align: center; z-index: 2;">
+        <span style="font-size: 9px; color: #22d3ee; letter-spacing: 2px;">
+            TIKET #{{ $index + 1 }} DARI {{ $transaction->quantity }}
+        </span>
+    </div>
+
+    {{-- Decorative divider line --}}
+    <div style="position: absolute; top: 150px; left: 100px; width: 250px; height: 1px;
+                background-color: #1e1b38; z-index: 2;"></div>
+    <div style="position: absolute; top: 148px; left: 220px; width: 10px; height: 5px;
+                background-color: #0c0a1d; z-index: 3;"></div>
+    <div style="position: absolute; top: 148px; left: 222px;
+                font-size: 7px; color: #a855f7; z-index: 4;">
+        &#9670;
+    </div>
+
+
+    {{-- ================================================================
+         UPPER CARD — QR Code Area
+         Card with dark bg, border, and purple left accent bar
+    ================================================================ --}}
+
+    {{-- Card background --}}
+    <div style="position: absolute; top: 162px; left: 35px; width: 376px; height: 195px;
+                background-color: #11102a; border: 1px solid #252244; z-index: 1;"></div>
+
+    {{-- Purple left accent bar --}}
+    <div style="position: absolute; top: 162px; left: 35px; width: 3px; height: 197px;
+                background-color: #a855f7; z-index: 2;"></div>
+
+    {{-- Small purple top accent on card --}}
+    <div style="position: absolute; top: 162px; left: 35px; width: 60px; height: 2px;
+                background-color: #a855f7; z-index: 2;"></div>
+
+    {{-- QR Code white box with cyan border --}}
+    <div style="position: absolute; top: 180px; left: 156px; z-index: 3;">
+        <div style="background-color: #ffffff;
+                    padding: 12px;
+                    border: 2px solid #22d3ee;
+                    width: 110px;
+                    height: 110px;
+                    line-height: 0;">
+            <img src="{{ $resolvedQr }}"
+                 style="width: 110px; height: 110px;"
+                 alt="QR Code" />
+        </div>
+    </div>
+
+    {{-- Status badge: LUNAS & VALID --}}
+    <div style="position: absolute; top: 325px; left: 0; width: 450px;
+                text-align: center; z-index: 3;">
+        <span style="color: #22d3ee; font-weight: bold; font-size: 12px;
+                     letter-spacing: 3px;">
+            LUNAS &amp; VALID
+        </span>
+    </div>
+
+
+    {{-- ================================================================
+         LOWER CARD — Transaction Data (4 Rows)
+         Card with dark bg, border, and cyan left accent bar
+    ================================================================ --}}
+
+    {{-- Card background --}}
+    <div style="position: absolute; top: 378px; left: 35px; width: 376px; height: 250px;
+                background-color: #11102a; border: 1px solid #252244; z-index: 1;"></div>
+
+    {{-- Cyan left accent bar --}}
+    <div style="position: absolute; top: 378px; left: 35px; width: 3px; height: 252px;
+                background-color: #22d3ee; z-index: 2;"></div>
+
+    {{-- Small cyan top accent on card --}}
+    <div style="position: absolute; top: 378px; left: 35px; width: 60px; height: 2px;
+                background-color: #22d3ee; z-index: 2;"></div>
+
+    {{-- ---- Row 1: NAMA VELORAN ---- --}}
+    <div style="position: absolute; top: 396px; left: 58px; z-index: 3;">
+        <span style="font-size: 7px; color: #64748b; text-transform: uppercase;
+                     letter-spacing: 2px; display: block; margin-bottom: 4px;">
+            NAMA VELORAN
+        </span>
+        <span style="font-size: 14px; color: #ffffff; font-weight: bold; display: block;">
+            {{ strtoupper($transaction->buyer_name) }}
+        </span>
+    </div>
+
+    {{-- Divider 1 --}}
+    <div style="position: absolute; top: 435px; left: 55px; width: 340px; height: 1px;
+                background-color: #1e1b38; z-index: 3;"></div>
+
+    {{-- ---- Row 2: KATEGORI TIKET ---- --}}
+    <div style="position: absolute; top: 448px; left: 58px; z-index: 3;">
+        <span style="font-size: 7px; color: #64748b; text-transform: uppercase;
+                     letter-spacing: 2px; display: block; margin-bottom: 4px;">
+            KATEGORI TIKET
+        </span>
+        <span style="font-size: 14px; color: #a855f7; font-weight: bold; display: block;">
+            TIKET BIASA
+        </span>
+    </div>
+
+    {{-- Divider 2 --}}
+    <div style="position: absolute; top: 487px; left: 55px; width: 340px; height: 1px;
+                background-color: #1e1b38; z-index: 3;"></div>
+
+    {{-- ---- Row 3: NOMOR INVOICE ---- --}}
+    <div style="position: absolute; top: 500px; left: 58px; z-index: 3;">
+        <span style="font-size: 7px; color: #64748b; text-transform: uppercase;
+                     letter-spacing: 2px; display: block; margin-bottom: 4px;">
+            NOMOR INVOICE
+        </span>
+        <span style="font-family: 'Courier New', monospace; font-size: 13px;
+                     color: #ffffff; font-weight: bold; display: block;">
+            {{ $transaction->invoice_number }}
+        </span>
+    </div>
+
+    {{-- Divider 3 --}}
+    <div style="position: absolute; top: 539px; left: 55px; width: 340px; height: 1px;
+                background-color: #1e1b38; z-index: 3;"></div>
+
+    {{-- ---- Row 4: KODE TIKET UNIK ---- --}}
+    <div style="position: absolute; top: 552px; left: 58px; z-index: 3;">
+        <span style="font-size: 7px; color: #64748b; text-transform: uppercase;
+                     letter-spacing: 2px; display: block; margin-bottom: 4px;">
+            KODE TIKET UNIK
+        </span>
+        <span style="font-family: 'Courier New', monospace; font-size: 13px;
+                     color: #22d3ee; font-weight: bold; display: block;">
+            {{ $ticketCode->unique_ticket_code }}
+        </span>
+    </div>
+
+
+    {{-- ================================================================
+         DECORATIVE — small corner accents on lower card
+    ================================================================ --}}
+
+    {{-- Bottom-right corner tick on lower card --}}
+    <div style="position: absolute; top: 628px; left: 391px; width: 20px; height: 2px;
+                background-color: #252244; z-index: 2;"></div>
+    <div style="position: absolute; top: 610px; left: 409px; width: 2px; height: 20px;
+                background-color: #252244; z-index: 2;"></div>
+
+
+    {{-- ================================================================
+         FOOTER — Disclaimer & event branding
+    ================================================================ --}}
+
+    {{-- Small decorative divider before footer --}}
+    <div style="position: absolute; top: 680px; left: 175px; width: 100px; height: 1px;
+                background-color: #1e1b38; z-index: 2;"></div>
+
+    <div style="position: absolute; top: 695px; left: 40px; width: 370px;
+                text-align: center; font-size: 7px; color: #3d3a56;
+                line-height: 1.6; z-index: 2;">
+        Scan QR Code ini pada pintu masuk. Satu QR code hanya berlaku untuk satu kali pemindaian.
+        PENTING: Dilarang keras menggandakan, memperjualbelikan kembali, atau membagikan e-ticket
+        ini kepada pihak lain. Panitia SPECTA XXI REVELIORA tidak bertanggung jawab atas
+        segala bentuk penyalahgunaan tiket.
+    </div>
+
+    {{-- Footer event mark --}}
+    <div style="position: absolute; top: 765px; left: 0; width: 450px;
+                text-align: center; z-index: 2;">
+        @if($resolvedSpectaLogo)
+        <img src="{{ $resolvedSpectaLogo }}"
+             style="height: 14px; width: auto; opacity: 0.7;"
+             alt="Logo SPECTA" />
+        <span style="font-size: 8px; color: #3d3a56; letter-spacing: 2px; margin-left: 5px; vertical-align: middle;">2026</span>
+        @endif
+    </div>
 
 </div>
+@endforeach
+
 </body>
 </html>

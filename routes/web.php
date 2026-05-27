@@ -22,7 +22,9 @@ Route::get('/', function () {
     $winners        = Winner::active()->get();
     $timelines      = Timeline::orderBy('year', 'desc')->get();
     $docsPreviews   = Documentation::active()->latest()->take(6)->get();
-    return view('welcome', compact('merchandises', 'eskuls', 'winners', 'timelines', 'docsPreviews'));
+    $announcements  = \App\Models\Information::where('is_active', true)->latest()->get();
+    
+    return view('welcome', compact('merchandises', 'eskuls', 'winners', 'timelines', 'docsPreviews', 'announcements'));
 });
 
 Route::get('/merch', [MerchController::class, 'index'])->name('merch.index');
@@ -63,6 +65,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/merchandises', [AdminController::class, 'merchandiseStore'])->name('merchandises.store');
     Route::post('/merchandises/{merchandise}', [AdminController::class, 'merchandiseUpdate'])->name('merchandises.update');
     Route::delete('/merchandises/{merchandise}', [AdminController::class, 'merchandiseDestroy'])->name('merchandises.destroy');
+
+    // ── Announcements / Informations ───────────────────────────────────────────
+    Route::resource('informations', \App\Http\Controllers\Admin\InformationController::class)->except(['show']);
 
     // ── Info Center Management ────────────────────────────────────────────────
     Route::get('/infocenter/eskul', [InfoCenterController::class, 'eskulIndex'])->name('infocenter.eskul');

@@ -25,49 +25,47 @@
                 </a>
                 <h1 class="font-bold text-slate-200">Katalog Merchandise</h1>
             </div>
-            <button @click="showAdd = true" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-purple-600/20 transition-all flex items-center gap-2 cursor-pointer">
+            <button @click.stop="showAdd = true" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-purple-600/20 transition-all flex items-center gap-2 cursor-pointer">
                 <span>➕</span> Tambah
             </button>
         </header>
 
     <main class="flex-1 px-6 py-8">
         {{-- Add Modal --}}
-        <template x-if="showAdd">
-            <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                <div @click.away="showAdd = false" class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-                    <h2 class="text-xl font-bold mb-6">Tambah Merchandise</h2>
-                    <form action="{{ route('admin.merchandises.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                        @csrf
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nama Produk</label>
-                            <input type="text" name="name" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Deskripsi</label>
-                            <textarea name="description" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm h-24"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Harga (Rp)</label>
-                            <input type="number" name="price" required min="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Foto Produk (JPG/PNG/WebP, maks 4MB)</label>
-                            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
-                            <p class="text-[10px] text-slate-500 mt-1">Otomatis dikonversi ke WebP</p>
-                        </div>
-                        <div class="flex gap-3 pt-2">
-                            <button type="button" @click="showAdd = false" class="flex-1 bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl font-bold text-sm cursor-pointer">Batal</button>
-                            <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-500 py-2.5 rounded-xl font-bold text-sm cursor-pointer">Simpan</button>
-                        </div>
-                    </form>
-                </div>
+        <div x-show="showAdd" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+            <div @click.outside="showAdd = false" class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h2 class="text-xl font-bold mb-6">Tambah Merchandise</h2>
+                <form action="{{ route('admin.merchandises.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nama Produk</label>
+                        <input type="text" name="name" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Deskripsi</label>
+                        <textarea name="description" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm h-24"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Harga (Rp)</label>
+                        <input type="number" name="price" required min="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Foto Produk (JPG/PNG/WebP, maks 4MB)</label>
+                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+                        <p class="text-[10px] text-slate-500 mt-1">Otomatis dikonversi ke WebP</p>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="showAdd = false" class="flex-1 bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl font-bold text-sm cursor-pointer">Batal</button>
+                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-500 py-2.5 rounded-xl font-bold text-sm cursor-pointer">Simpan</button>
+                    </div>
+                </form>
             </div>
-        </template>
+        </div>
 
         {{-- Edit Modal --}}
         <template x-if="editItem">
             <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                <div @click.away="editItem = null" class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div @click.outside="editItem = null" class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                     <h2 class="text-xl font-bold mb-6">Edit Merchandise</h2>
                     <form :action="'/admin/merchandises/' + editItem.id" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
@@ -122,7 +120,7 @@
                     <p class="text-sm text-slate-400 line-clamp-3 mb-4 flex-1">{{ $merch->description }}</p>
                     <div class="flex gap-2">
                         <button 
-                            @click="editItem = {{ json_encode($merch) }}"
+                            @click.stop="editItem = window.merchandisesData.find(item => item.id === {{ $merch->id }})"
                             class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium py-2 rounded-xl transition-colors cursor-pointer"
                         >
                             Edit
@@ -156,4 +154,10 @@
     </main>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    window.merchandisesData = @json($merchandises->items());
+</script>
+@endpush
 @endsection

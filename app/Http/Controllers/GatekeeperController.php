@@ -61,7 +61,6 @@ class GatekeeperController extends Controller
         return response()->json([
             'message' => 'Tiket Valid!',
             'buyer_name' => $transaction->buyer_name,
-            'buyer_class' => $transaction->buyer_class,
             'ticket_name' => $transaction->ticket->ticket_name ?? $transaction->ticket->name,
             'invoice' => $transaction->invoice_number,
         ], 200);
