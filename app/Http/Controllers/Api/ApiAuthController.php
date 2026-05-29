@@ -56,7 +56,9 @@ class ApiAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        /** @var \Laravel\Sanctum\PersonalAccessToken $token */
+        $token = $request->user()->currentAccessToken();
+        $token->delete();
         
         return $this->successResponse(null, 'Successfully logged out');
     }

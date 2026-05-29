@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,13 +22,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\RateLimiter::for('auth_strict', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(30)->by($request->ip())->response(function (\Illuminate\Http\Request $request, array $headers) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Terlalu banyak percobaan. Silakan coba lagi nanti.'
-                ], 429, $headers);
-            });
+        // Rate limiter untuk seluruh rute autentikasi:
+        // login lokal, register, dan tombol Google OAuth
+        // Batas: 5 percobaan per menit per IP Address
+        RateLimiter::for('auth_strict', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by($request->ip())
+                ->response(function () {
+                    return redirect()->route('login')
+                        ->withErrors([
+                            'email' => 'Terlalu banyak percobaan. Silakan tunggu 1 menit lalu coba lagi.',
+                        ]);
+                });
         });
     }
 }

@@ -26,17 +26,11 @@
     <div class="space-y-3">
         <div x-show="preview" class="relative rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
             <img :src="preview" class="w-full h-44 object-contain">
-            <button type="button" @click="preview = null; $el.closest('[x-data]').querySelector('input[type=file]:not(.hidden)').value = ''" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-900/80 border border-slate-600 hover:border-red-500 rounded-lg p-1 text-slate-400 hover:text-red-400 transition-all">
+            <button type="button" @click="preview = null; $el.closest('[x-data]').querySelector('input[type=file]').value = ''" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-900/80 border border-slate-600 hover:border-red-500 rounded-lg p-1 text-slate-400 hover:text-red-400 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <label x-show="!preview" class="flex flex-col items-center gap-2 border-2 border-dashed border-slate-700 hover:border-cyan-500/60 rounded-xl p-6 text-center cursor-pointer transition-all bg-slate-950/50 hover:bg-cyan-950/10">
-            <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <span class="text-xs text-slate-400">Klik untuk pilih foto / banner</span>
-            <span class="text-[10px] text-slate-600 uppercase tracking-wider">JPG / PNG / WebP &middot; maks 3MB</span>
-            <input type="file" name="image" accept="image/*" class="hidden" @change="const f=$event.target.files[0]; if(f){const r=new FileReader();r.onload=e=>preview=e.target.result;r.readAsDataURL(f)}">
-        </label>
-        <input x-show="preview" type="file" name="image" accept="image/*" class="w-full bg-slate-950 border border-slate-700 text-slate-400 rounded-xl px-4 py-2.5 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-cyan-600 file:text-white file:text-xs file:cursor-pointer" @change="const f=$event.target.files[0]; if(f){const r=new FileReader();r.onload=e=>preview=e.target.result;r.readAsDataURL(f)}">
+        <input type="file" name="image" accept="image/*" class="w-full bg-slate-950 border border-slate-700 text-slate-400 rounded-xl px-4 py-2.5 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-cyan-600 file:text-white file:text-xs file:cursor-pointer" @change="const f=$event.target.files[0]; if(f){ if(f.size > 3 * 1024 * 1024) { alert('Ukuran file terlalu besar! Maksimal 3MB.'); $event.target.value=''; preview='{{ $t?->image_url ?? '' }}'; return; } const r=new FileReader();r.onload=e=>preview=e.target.result;r.readAsDataURL(f)} else { preview='{{ $t?->image_url ?? '' }}'; }">
         @if($t?->image_path)
         <p class="text-xs text-slate-500">Upload baru untuk mengganti foto saat ini.</p>
         @endif

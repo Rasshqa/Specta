@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GatekeeperController;
 use App\Http\Controllers\InfoCenterController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SocialiteController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Merchandise;
 use App\Models\EskulProfile;
@@ -16,12 +17,13 @@ use App\Http\Controllers\DocsController;
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
 Route::get('/', function () {
-    $merchandises   = Merchandise::all();
-    $eskuls         = EskulProfile::active()->get();
-    $winners        = Winner::active()->get();
-    $timelines      = Timeline::orderBy('year', 'desc')->get();
-    $docsPreviews   = Documentation::active()->latest()->take(6)->get();
-    $announcements  = \App\Models\Information::where('is_active', true)->latest()->get();
+    $ttl = 3600; // 1 hour caching
+    $merchandises   = cache()->remember('home_merch', $ttl, fn() => Merchandise::all());
+    $eskuls         = cache()->remember('home_eskuls', $ttl, fn() => EskulProfile::active()->get());
+    $winners        = cache()->remember('home_winners', $ttl, fn() => Winner::active()->get());
+    $timelines      = cache()->remember('home_timelines', $ttl, fn() => Timeline::orderBy('year', 'desc')->get());
+    $docsPreviews   = cache()->remember('home_docs', $ttl, fn() => Documentation::active()->latest()->take(6)->get());
+    $announcements  = cache()->remember('home_announcements', $ttl, fn() => \App\Models\Information::where('is_active', true)->latest()->get());
     // Cached Ticket Quota Indicator (30 seconds)
     $quotaData = cache()->remember('ticket_quota', 30, function () {
         $totalCapacity = 1500;
@@ -51,6 +53,12 @@ Route::middleware(['throttle:auth_strict'])->group(function () {
     Route::post('/register',[AuthController::class, 'register'])->name('register.post');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ─── Google OAuth (Socialite) ─────────────────────────────────────────────────
+Route::middleware(['throttle:auth_strict'])->group(function () {
+    Route::get('/auth/google',          [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+});
 
 // ─── Ticket Buying Flow & Dashboard (Protected - requires login) ───────────────
 Route::middleware(['auth'])->group(function () {
