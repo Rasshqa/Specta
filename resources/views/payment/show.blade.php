@@ -186,7 +186,12 @@
                         <p class="text-xs text-slate-500 mb-4">
                             Setelah transfer/scan QRIS, upload screenshot atau foto bukti pembayaran Anda di sini.
                             @if($transaction->payment_proof)
-                                <span class="text-green-400 ml-1"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M21 7L9 19l-5.5-5.5l1.41-1.41L9 16.17L19.59 5.59z"/></svg> Sudah diunggah — tim kami sedang memverifikasi.</span>
+                                <div class="mt-2 flex items-center gap-2">
+                                    <span class="text-green-400 text-xs"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M21 7L9 19l-5.5-5.5l1.41-1.41L9 16.17L19.59 5.59z"/></svg> Sudah diunggah — tim kami sedang memverifikasi.</span>
+                                    <a href="{{ asset('storage/proofs/' . $transaction->payment_proof) }}" target="_blank" class="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 ml-2 underline text-xs font-semibold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> Lihat Bukti
+                                    </a>
+                                </div>
                             @endif
                         </p>
 
@@ -197,26 +202,47 @@
                             @csrf
 
                             <label for="payment_proof"
-                                   class="flex flex-col items-center justify-center gap-3 w-full h-32 border-2 border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl cursor-pointer bg-slate-900/40 transition-all group"
-                                   x-data="{ fileName: '' }"
+                                   class="flex flex-col items-center justify-center gap-3 w-full h-40 border-2 border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl cursor-pointer bg-slate-900/40 transition-all group overflow-hidden"
+                                   x-data="{ fileName: '', previewUrl: '' }"
                                    @dragover.prevent
-                                   @drop.prevent="fileName = $event.dataTransfer.files[0]?.name; $refs.fileInput.files = $event.dataTransfer.files">
+                                   @drop.prevent="
+                                       const file = $event.dataTransfer.files[0];
+                                       if (file) {
+                                           fileName = file.name;
+                                           previewUrl = URL.createObjectURL(file);
+                                           $refs.fileInput.files = $event.dataTransfer.files;
+                                       }
+                                   ">
 
-                                <svg class="w-8 h-8 text-slate-600 group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
+                                <template x-if="!previewUrl">
+                                    <div class="flex flex-col items-center justify-center pointer-events-none p-4">
+                                        <svg class="w-8 h-8 text-slate-600 group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="text-xs text-slate-500 group-hover:text-slate-400 transition-colors text-center mt-2"
+                                              x-text="fileName || 'Klik atau seret file kesini\n(JPG, PNG, WEBP • max 10MB)'">
+                                        </span>
+                                    </div>
+                                </template>
 
-                                <span class="text-xs text-slate-500 group-hover:text-slate-400 transition-colors text-center"
-                                      x-text="fileName || 'Klik atau seret file kesini\n(JPG, PNG, WEBP • max 10MB)'">
-                                    Klik atau seret file ke sini (JPG, PNG, WEBP • maks 10MB)
-                                </span>
+                                <template x-if="previewUrl">
+                                    <div class="w-full h-full p-2 flex items-center justify-center bg-slate-900">
+                                        <img :src="previewUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-lg" alt="Preview Bukti Pembayaran">
+                                    </div>
+                                </template>
 
                                 <input id="payment_proof"
                                        name="payment_proof"
                                        type="file"
                                        accept="image/jpeg,image/png,image/webp"
                                        x-ref="fileInput"
-                                       @change="fileName = $event.target.files[0]?.name"
+                                       @change="
+                                           const file = $event.target.files[0];
+                                           if (file) {
+                                               fileName = file.name;
+                                               previewUrl = URL.createObjectURL(file);
+                                           }
+                                       "
                                        class="hidden">
                             </label>
 

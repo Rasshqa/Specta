@@ -52,13 +52,54 @@
                         <div class="space-y-4">
                             <div>
                                 <label for="file" class="block text-xs font-bold text-slate-500 uppercase mb-2">File (Image/Video)</label>
-                                <div class="relative group">
-                                    <input type="file" id="file" name="file" required accept="image/*,video/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
-                                    <div class="border-2 border-dashed border-slate-700 group-hover:border-purple-500/50 rounded-2xl p-8 text-center transition-all bg-slate-950/50">
-                                        <div class="text-3xl mb-2"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z"/></svg></div>
-                                        <p class="text-sm text-slate-400">Klik atau drop file di sini</p>
-                                        <p class="text-[10px] text-slate-500 mt-2 uppercase tracking-widest">Image auto-convert ke WebP | Video maks 50MB</p>
+                                <div x-data="{
+                                    preview: null,
+                                    fileType: null,
+                                    fileName: null,
+                                    handleFile(event) {
+                                        const f = event.target.files[0];
+                                        if (!f) return;
+                                        this.fileName = f.name;
+                                        this.fileType = f.type.startsWith('video') ? 'video' : 'image';
+                                        const reader = new FileReader();
+                                        reader.onload = e => this.preview = e.target.result;
+                                        reader.readAsDataURL(f);
+                                    },
+                                    clearPreview() {
+                                        this.preview = null;
+                                        this.fileType = null;
+                                        this.fileName = null;
+                                        if (this.$refs.fileInput) this.$refs.fileInput.value = '';
+                                        if (this.$refs.fileInputReplace) this.$refs.fileInputReplace.value = '';
+                                    }
+                                }">
+                                    {{-- Preview Area --}}
+                                    <div x-show="preview" class="relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 mb-3">
+                                        <img x-show="fileType === 'image'" :src="preview" class="w-full max-h-56 object-contain">
+                                        <video x-show="fileType === 'video'" :src="preview" controls class="w-full max-h-56 object-contain bg-black"></video>
+                                        <div class="px-4 py-2 flex items-center justify-between border-t border-slate-800 bg-slate-900/80">
+                                            <span class="text-xs text-slate-400 truncate max-w-[70%]" x-text="fileName"></span>
+                                            <button type="button" @click="clearPreview()" class="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-400 bg-red-950/20 hover:bg-red-950/40 px-2 py-1 rounded-lg transition-all">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                Hapus
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    {{-- Drop Zone --}}
+                                    <div x-show="!preview" class="relative group">
+                                        <input type="file" id="file" name="file" required accept="image/*,video/*" x-ref="fileInput" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" @change="handleFile($event)">
+                                        <div class="border-2 border-dashed border-slate-700 group-hover:border-purple-500/50 rounded-2xl p-8 text-center transition-all bg-slate-950/50">
+                                            <div class="text-4xl mb-3 flex justify-center text-slate-500">
+                                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            </div>
+                                            <p class="text-sm text-slate-400 font-medium">Klik atau drop file di sini</p>
+                                            <p class="text-[10px] text-slate-500 mt-2 uppercase tracking-widest">Image auto-convert ke WebP &nbsp;|&nbsp; Video maks 50MB</p>
+                                        </div>
+                                    </div>
+
+                                    {{-- File input shown after preview selected --}}
+                                    <input x-show="preview" type="file" id="file_replace" name="file" required accept="image/*,video/*" x-ref="fileInputReplace" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:cursor-pointer mt-2" @change="handleFile($event)">
                                 </div>
                             </div>
                             <div class="flex justify-end pt-4">

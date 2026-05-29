@@ -81,7 +81,7 @@
                     :class="open === {{ $doc->id }} ? 'opacity-100' : ''"
                 >
                     @if($doc->event_date)
-                    <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-1">{{ $doc->event_date->format('d M Y') }}</span>
+                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-1">{{ \Carbon\Carbon::parse($doc->event_date)->format('d M Y') }}</span>
                     @endif
                     <h3 class="font-bold text-white text-sm leading-tight">{{ $doc->title }}</h3>
                     @if($doc->description)

@@ -29,7 +29,7 @@
     </div>
 
     <!-- ─── NAVIGATION BAR ─── -->
-    <nav :class="showNav ? 'translate-y-0' : '-translate-y-full'" class="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/5 transition-transform duration-300">
+    <nav :class="showNav ? 'translate-y-0' : '-translate-y-full'" class="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 transition-transform duration-300">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             
             <!-- Left Logo -->
@@ -532,8 +532,7 @@
                         {{-- Foto eskul --}}
                         @if($eskul->image_path)
                         <div class="relative h-40 overflow-hidden">
-                            <img src="{{ $eskul->image_url }}" alt="{{ $eskul->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <img src="{{ $eskul->image_url ?? asset('images/placeholder.svg') }}" alt="{{ $eskul->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-3 left-3 w-11 h-11 rounded-xl bg-black/50 backdrop-blur flex items-center justify-center text-2xl">{!! $eskul->icon !!}</div>
                         </div>
                         @else
@@ -621,13 +620,7 @@
                                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors"
                                         x-show="searchWinner === '' || '{{ strtolower($winner->name . ' ' . $winner->school . ' ' . $winner->category) }}'.includes(searchWinner.toLowerCase())">
                                         <td class="py-3 px-5">
-                                            @if($winner->image_path)
-                                                <img src="{{ $winner->image_url }}" alt="{{ $winner->name }}" class="w-9 h-9 rounded-full object-cover border border-slate-700">
-                                            @else
-                                                <div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                </div>
-                                            @endif
+                                            <img src="{{ $winner->image_url ?? asset('images/placeholder.svg') }}" alt="{{ $winner->name }}" class="w-9 h-9 rounded-full object-cover border border-slate-700">
                                         </td>
                                         <td class="py-3 px-5 text-sm font-black text-purple-400 whitespace-nowrap">{{ $winner->rank }}</td>
                                         <td class="py-3 px-5 text-sm font-bold text-slate-100 whitespace-nowrap">{{ $winner->name }}</td>
@@ -678,7 +671,7 @@
                         </div>
                         <div class="bg-white/5 border {{ $tl->is_current ? 'border-cyan-500/30' : 'border-white/10' }} rounded-2xl overflow-hidden">
                             @if($tl->image_path)
-                            <img src="{{ $tl->image_url }}" alt="{{ $tl->title }}" class="w-full h-36 object-cover">
+                            <img src="{{ $tl->image_url ?? asset('images/placeholder.svg') }}" alt="{{ $tl->title }}" class="w-full h-36 object-cover">
                             @endif
                             <div class="p-5">
                                 <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -739,7 +732,6 @@
                 <template x-if="selectedEskul && selectedEskul.image_url">
                     <div class="relative h-44 flex-shrink-0 overflow-hidden">
                         <img :src="selectedEskul.image_url" :alt="selectedEskul.name" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/30 to-transparent"></div>
                         <!-- Icon overlay on image -->
                         <div class="absolute bottom-3 left-4 flex items-end gap-3">
                             <div class="w-11 h-11 rounded-2xl bg-slate-900/80 backdrop-blur border border-white/10 flex items-center justify-center text-2xl" x-text="selectedEskul ? selectedEskul.icon : ''"></div>
@@ -993,7 +985,7 @@
                     <!-- Hover info overlay -->
                     <div class="absolute inset-0 flex flex-col justify-end p-4" x-show="info" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
                         @if($doc->event_date)
-                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-1">{{ $doc->event_date->format('d M Y') }}</span>
+                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-1">{{ \Carbon\Carbon::parse($doc->event_date)->format('d M Y') }}</span>
                         @endif
                         <h3 class="font-bold text-white text-sm leading-tight">{{ $doc->title }}</h3>
                         @if($doc->description)
