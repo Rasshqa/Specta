@@ -3,7 +3,9 @@
 @section('title', 'SPECTA REVELIORA – The Dark Fantasy Festival')
 
 @section('content')
-<div x-data="{ mobileMenuOpen: false, userDropdownOpen: false }" class="bg-black text-slate-100 min-h-screen relative overflow-hidden font-sans">
+<div x-data="{ mobileMenuOpen: false, userDropdownOpen: false, lastScroll: 0, showNav: true }" 
+     @scroll.window="showNav = (window.pageYOffset < lastScroll || window.pageYOffset < 80); lastScroll = window.pageYOffset"
+     class="bg-black text-slate-100 min-h-screen relative overflow-hidden font-sans">
     
     <!-- Ambient Universe Glows -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -27,7 +29,7 @@
     </div>
 
     <!-- ─── NAVIGATION BAR ─── -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/5 transition-all duration-300">
+    <nav :class="showNav ? 'translate-y-0' : '-translate-y-full'" class="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/5 transition-transform duration-300">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             
             <!-- Left Logo -->
@@ -61,7 +63,7 @@
                     <!-- Authenticated User Dropdown -->
                     <div class="relative">
                         <button @click="userDropdownOpen = !userDropdownOpen" @click.away="userDropdownOpen = false" class="flex items-center gap-2 bg-white/5 border border-white/10 hover:border-purple-500/40 rounded-xl px-4 py-2 text-sm text-slate-200 transition-all cursor-pointer">
-                            <span>👤 {{ Auth::user()->name }}</span>
+                            <span><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg> {{ Auth::user()->name }}</span>
                             <svg class="w-4 h-4 transition-transform duration-200" :class="userDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         
@@ -136,10 +138,6 @@
     <section class="min-h-screen flex items-center justify-center pt-28 pb-20 relative z-10 px-6">
         <div class="max-w-5xl text-center" data-aos="zoom-out" data-aos-duration="1200">
             
-            <!-- Festival Badge -->
-            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-950/40 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-widest mb-8 backdrop-blur-md">
-                ✨ PREMIUM SCHOOL FESTIVAL 2026 ✨
-            </span>
 
             <!-- Main Heading Logo -->
             <div class="mb-8 w-full max-w-4xl mx-auto px-4" data-aos="fade-down">
@@ -155,28 +153,54 @@
             <!-- Description -->
             <p class="text-slate-400 text-base md:text-lg max-w-3xl mx-auto mb-12 leading-relaxed font-light">
                 Program kerja tahunan OSIS &amp; MPK <span class="text-slate-300 font-semibold">SMAN 1 Cianjur</span> yang menghadirkan tiga fase akbar — Grand Opening, Middle Event, hingga Grand Closing berupa konser spektakuler.
-                Bertema <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-400 font-bold">Celestial Treasure</span> — merayakan bahwa kebersamaan dan kreativitas adalah harta karun sejati yang tak ternilai.
+                Bertema <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-300 to-purple-400 mb-8 hero-neon font-bold">Celestial Treasure</span> — merayakan bahwa kebersamaan dan kreativitas adalah harta karun sejati yang tak ternilai.
             </p>
 
             <!-- Metadata Info Badges -->
-            <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 mb-12 font-medium">
+            <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 mb-8 font-medium">
                 <span class="flex items-center gap-2 bg-slate-900/60 border border-slate-800 px-4 py-2 rounded-xl">
-                    📅 April 26, 2026
-                </span>
-                <span class="flex items-center gap-2 bg-slate-900/60 border border-slate-800 px-4 py-2 rounded-xl">
-                    📍 Jl. Pangeran Hidayatullah No.62, Sawah Gede, Kec. Cianjur, Kabupaten Cianjur, Jawa Barat 43212
-                </span>
-                <span class="flex items-center gap-2 bg-slate-900/60 border border-slate-800 px-4 py-2 rounded-xl">
-                    ⏰ 13:00 – 23:00 WIB
+                    <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"/></svg> Jl. Pangeran Hidayatullah No.62, Sawah Gede, Kec. Cianjur, Kabupaten Cianjur, Jawa Barat 43212
                 </span>
             </div>
+
+            <!-- Real-Time Ticket Quota -->
+            @if(isset($quotaData))
+            <div class="max-w-2xl mx-auto mb-12 bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.1)] relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="flex justify-between items-end mb-3 relative z-10">
+                    <div class="text-left">
+                        <p class="text-sm text-slate-400 font-medium tracking-wider uppercase">Kapasitas Tersedia</p>
+                        <p class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                            {{ number_format($quotaData->remaining) }} <span class="text-sm font-medium text-slate-500">/ {{ number_format($quotaData->capacity) }} Kursi</span>
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-white">{{ number_format($quotaData->percentage, 1) }}% Terjual</p>
+                    </div>
+                </div>
+                <div class="w-full h-3 bg-slate-900/80 rounded-full overflow-hidden border border-slate-800 relative z-10">
+                    <div class="h-full bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(168,85,247,0.8)]" style="width: {{ $quotaData->percentage }}%"></div>
+                </div>
+            </div>
+            @endif
 
             <!-- Call to Actions -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-5 max-w-md mx-auto sm:max-w-none">
                 <a href="{{ route('tickets.index') }}" class="w-full sm:w-auto group relative px-10 py-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-full font-extrabold text-white text-lg tracking-wider transition-all duration-300 hover:scale-105 shadow-[0_0_35px_rgba(168,85,247,0.45)] hover:shadow-[0_0_55px_rgba(168,85,247,0.65)] flex items-center justify-center gap-2">
-                    🎟️ BUY TICKET
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                    BUY TICKET
                     <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </a>
+                
+                @auth
+                    @if(\App\Models\Transaction::where('buyer_email', Auth::user()->email)->orWhere('buyer_whatsapp', Auth::user()->email)->exists())
+                    <a href="{{ route('user.dashboard') }}" class="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-full font-extrabold text-white text-lg tracking-wider transition-all duration-300 hover:scale-105 shadow-[0_0_35px_rgba(6,182,212,0.45)] hover:shadow-[0_0_55px_rgba(6,182,212,0.65)] flex items-center justify-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                        MY TICKETS
+                    </a>
+                    @endif
+                @endauth
+
                 <a href="#lore" class="w-full sm:w-auto px-10 py-5 bg-black/40 hover:bg-slate-900/50 border border-slate-700/60 hover:border-slate-500 rounded-full font-bold text-slate-300 text-lg tracking-wider backdrop-blur-md transition-all hover:scale-105">
                     EXPLORE LORE
                 </a>
@@ -189,7 +213,9 @@
                     <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Guest Stars</p>
                 </div>
                 <div>
-                    <p class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">825+</p>
+                    <p class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                        {{ isset($quotaData) ? number_format($quotaData->remaining) : '825+' }}
+                    </p>
                     <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Tickets Available</p>
                 </div>
                 <div>
@@ -218,13 +244,13 @@
             <!-- Section Header -->
             <div class="text-center mb-20" data-aos="fade-up">
                 <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-950/50 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-[0.25em] mb-6">
-                    ✧˖° SPECTA XXI PROUDLY PRESENTS °˖✧
+                    <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L9 9l-8 3l8 3l3 8l3-8l8-3l-8-3z"/></svg>˖° SPECTA XXI PROUDLY PRESENTS °˖<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L9 9l-8 3l8 3l3 8l3-8l8-3l-8-3z"/></svg>
                 </span>
                 <h2 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-300 to-cyan-400 uppercase tracking-wide leading-tight">
                     SPECTA REVELIORA
                 </h2>
                 <p class="text-slate-400 max-w-3xl mx-auto mt-5 text-base md:text-lg leading-relaxed italic font-light">
-                    "Guided by the spirit of Reveliora, we begin a journey of discovery, courage, and endless creativity, where every step brings us closer to something extraordinary." 🌌
+                    "Guided by the spirit of Reveliora, we begin a journey of discovery, courage, and endless creativity, where every step brings us closer to something extraordinary." <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m17.75 4.09l-2.53 1.94l.91 3.06l-2.63-1.81l-2.63 1.81l.91-3.06l-2.53-1.94L12.44 4l1.06-3l1.06 3zm3.5 6.91l-1.64 1.25l.59 1.98l-1.7-1.17l-1.7 1.17l.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85c-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14c.4-.4.82-.76 1.27-1.08c.75-.53 1.93.36 1.85 1.19c-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82c-2.81 3.14-2.7 7.96.31 10.98c3.02 3.01 7.84 3.12 10.98.31"/></svg>
                 </p>
             </div>
 
@@ -235,8 +261,26 @@
                 <div class="relative group bg-gradient-to-b from-blue-950/40 to-slate-950/60 backdrop-blur-xl border border-blue-500/20 rounded-3xl p-8 overflow-hidden hover:border-blue-400/40 transition-all duration-500">
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
                     <div class="relative z-10">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-400/10 border border-blue-500/30 flex items-center justify-center text-3xl mb-6 shadow-inner">
-                            🚀
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-400/10 border border-blue-500/30 flex items-center justify-center mb-6 shadow-inner overflow-hidden">
+                            {{-- Tongkat Biru --}}
+                            <svg viewBox="0 0 40 56" width="32" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                {{-- Mahkota --}}
+                                <path d="M16 10 L12 4 L20 8 L28 4 L24 10 Z" fill="#60a5fa" opacity="0.9"/>
+                                <rect x="17" y="9" width="6" height="3" rx="1" fill="#3b82f6"/>
+                                {{-- Batang tongkat --}}
+                                <rect x="18" y="12" width="4" height="36" rx="2" fill="url(#blueWand)"/>
+                                {{-- Ujung bawah --}}
+                                <ellipse cx="20" cy="48" rx="3" ry="2" fill="#2563eb"/>
+                                {{-- Glow tengah --}}
+                                <rect x="19" y="14" width="2" height="30" rx="1" fill="#93c5fd" opacity="0.5"/>
+                                <defs>
+                                    <linearGradient id="blueWand" x1="18" y1="12" x2="22" y2="48" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#60a5fa"/>
+                                        <stop offset="50%" stop-color="#3b82f6"/>
+                                        <stop offset="100%" stop-color="#1d4ed8"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
                         </div>
                         <span class="text-xs font-bold text-blue-400 uppercase tracking-[0.2em] block mb-2">Simbol Pertama</span>
                         <h3 class="text-2xl font-black text-slate-100 mb-4">Tongkat Biru</h3>
@@ -259,8 +303,35 @@
                         Utama
                     </div>
                     <div class="relative z-10">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-purple-400/10 border border-purple-500/30 flex items-center justify-center text-3xl mb-6 shadow-inner">
-                            🦢
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-purple-400/10 border border-purple-500/30 flex items-center justify-center mb-6 shadow-inner overflow-hidden">
+                            {{-- Angsa Ungu --}}
+                            <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                {{-- Badan angsa --}}
+                                <ellipse cx="26" cy="32" rx="14" ry="9" fill="url(#swanBody)"/>
+                                {{-- Sayap --}}
+                                <path d="M14 30 Q8 22 12 16 Q16 22 18 28Z" fill="#c084fc" opacity="0.7"/>
+                                <path d="M38 28 Q44 20 42 14 Q37 20 35 27Z" fill="#a855f7" opacity="0.5"/>
+                                {{-- Leher --}}
+                                <path d="M20 28 Q18 20 22 12 Q26 8 28 12 Q24 18 24 26Z" fill="url(#swanNeck)"/>
+                                {{-- Kepala --}}
+                                <ellipse cx="27" cy="10" rx="5" ry="4.5" fill="#d8b4fe"/>
+                                {{-- Paruh --}}
+                                <path d="M31 10 L36 10.5 L31 11.5Z" fill="#f59e0b"/>
+                                {{-- Mata --}}
+                                <circle cx="29" cy="9" r="1" fill="#1e1b38"/>
+                                {{-- Ekor --}}
+                                <path d="M38 34 Q44 38 42 42 Q38 40 36 36Z" fill="#9333ea" opacity="0.8"/>
+                                <defs>
+                                    <linearGradient id="swanBody" x1="12" y1="32" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#c084fc"/>
+                                        <stop offset="100%" stop-color="#7e22ce"/>
+                                    </linearGradient>
+                                    <linearGradient id="swanNeck" x1="20" y1="12" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#e9d5ff"/>
+                                        <stop offset="100%" stop-color="#c084fc"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
                         </div>
                         <span class="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] block mb-2">Simbol Kedua</span>
                         <h3 class="text-2xl font-black text-slate-100 mb-4">Angsa Ungu</h3>
@@ -279,8 +350,9 @@
                 <div class="relative group bg-gradient-to-b from-cyan-950/40 to-slate-950/60 backdrop-blur-xl border border-cyan-500/20 rounded-3xl p-8 overflow-hidden hover:border-cyan-400/40 transition-all duration-500">
                     <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all duration-500"></div>
                     <div class="relative z-10">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600/20 to-cyan-400/10 border border-cyan-500/30 flex items-center justify-center text-3xl mb-6 shadow-inner">
-                            ✦
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600/20 to-cyan-400/10 border border-cyan-500/30 flex items-center justify-center mb-6 shadow-inner overflow-hidden p-1">
+                            {{-- Logo R SPECTA --}}
+                            <img src="{{ asset('images/specta-R.png') }}" alt="Simbol R SPECTA" class="w-full h-full object-contain" style="filter: drop-shadow(0 0 4px rgba(34,211,238,0.4));"/>
                         </div>
                         <span class="text-xs font-bold text-cyan-400 uppercase tracking-[0.2em] block mb-2">Simbol Ketiga</span>
                         <h3 class="text-2xl font-black text-slate-100 mb-4">Bentuk "R" & 21</h3>
@@ -308,16 +380,16 @@
                 <div class="relative z-10 p-10 md:p-16 grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
                     <!-- Left: Theme Name -->
                     <div class="lg:col-span-2 text-center lg:text-left">
-                        <span class="text-xs font-bold text-yellow-400 uppercase tracking-[0.25em] block mb-3">Tema SPECTA XXI</span>
+                        <span class="text-xs font-bold text-purple-400 uppercase tracking-[0.25em] block mb-3">Tema SPECTA XXI</span>
                         <h3 class="text-4xl md:text-5xl font-black text-white leading-tight mb-3">
                             CELESTIAL<br>
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-400">TREASURE</span>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">TREASURE</span>
                         </h3>
                         <p class="text-slate-400 text-sm font-medium italic">"Harta Karun Langit"</p>
                         
                         <div class="mt-8 flex items-center gap-3 justify-center lg:justify-start">
-                            <span class="text-2xl">💙</span>
-                            <p class="text-slate-300 text-sm font-bold italic">Uncover the Wonders,<br>Beyond the Stars 🌟</p>
+                            <span class="text-2xl"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53z"/></svg></span>
+                            <p class="text-slate-300 text-sm font-bold italic">Uncover the Wonders,<br>Beyond the Stars <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z"/></svg></p>
                         </div>
                     </div>
 
@@ -329,21 +401,21 @@
                     <!-- Right: Philosophy Breakdown -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="flex gap-4 items-start">
-                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-lg mt-0.5">✦</div>
+                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-lg mt-0.5"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m12 6.7l1.45 3.85L17.3 12l-3.85 1.45L12 17.3l-1.45-3.85L6.7 12l3.85-1.45zM12 1L9 9l-8 3l8 3l3 8l3-8l8-3l-8-3z"/></svg></div>
                             <div>
-                                <h4 class="text-sm font-black text-yellow-300 uppercase tracking-wider mb-1">CELESTIAL (Langit)</h4>
+                                <h4 class="text-sm font-black text-purple-300 uppercase tracking-wider mb-1">CELESTIAL (Langit)</h4>
                                 <p class="text-xs text-slate-400 leading-relaxed">Melambangkan sifat luhur, tak terbatas, dan agung dari potensi serta semangat para siswa SMANSA.</p>
                             </div>
                         </div>
                         <div class="flex gap-4 items-start">
-                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-lg mt-0.5">💎</div>
+                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-lg mt-0.5"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2L2 8l10 14L22 8l-4-6z"/></svg></div>
                             <div>
-                                <h4 class="text-sm font-black text-amber-300 uppercase tracking-wider mb-1">TREASURE (Harta Karun)</h4>
+                                <h4 class="text-sm font-black text-cyan-300 uppercase tracking-wider mb-1">TREASURE (Harta Karun)</h4>
                                 <p class="text-xs text-slate-400 leading-relaxed">Menyimbolkan nilai intrinsik hasil dari dedikasi, kebersamaan, dan perjuangan — warisan abadi yang tercipta bersama.</p>
                             </div>
                         </div>
                         <div class="flex gap-4 items-start">
-                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-lg mt-0.5">🌌</div>
+                            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-lg mt-0.5"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m17.75 4.09l-2.53 1.94l.91 3.06l-2.63-1.81l-2.63 1.81l.91-3.06l-2.53-1.94L12.44 4l1.06-3l1.06 3zm3.5 6.91l-1.64 1.25l.59 1.98l-1.7-1.17l-1.7 1.17l.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85c-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14c.4-.4.82-.76 1.27-1.08c.75-.53 1.93.36 1.85 1.19c-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82c-2.81 3.14-2.7 7.96.31 10.98c3.02 3.01 7.84 3.12 10.98.31"/></svg></div>
                             <div>
                                 <h4 class="text-sm font-black text-purple-300 uppercase tracking-wider mb-1">Filosofi Inti</h4>
                                 <p class="text-xs text-slate-400 leading-relaxed">Kebersamaan & kreativitas yang tak terbatas menciptakan warisan yang sangat berharga dan akan dikenang abadi.</p>
@@ -360,7 +432,7 @@
                     "So, Velorans…"
                 </p>
                 <p class="text-slate-400 text-base mt-3 italic font-light">
-                    let's uncover the wonders and shine beyond the stars together! ✨
+                    let's uncover the wonders and shine beyond the stars together! <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25M9 4L6.5 9.5L1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5M19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.26"/></svg>
                 </p>
             </div>
 
@@ -413,14 +485,17 @@
 
             <!-- Tab Switchers -->
             <div class="flex items-center justify-center gap-1 mb-8 bg-white/5 border border-white/10 rounded-2xl p-1 max-w-md mx-auto">
-                <button @click="infoTab = 'eskul'" :class="infoTab === 'eskul' ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'" class="flex-1 py-2.5 px-3 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer text-center">
-                    🎟️ <span class="hidden sm:inline">Eskul</span>
+                <button @click="infoTab = 'eskul'" :class="infoTab === 'eskul' ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'" class="flex-1 py-2.5 px-3 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer text-center flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <span class="hidden sm:inline">Eskul</span>
                 </button>
-                <button @click="infoTab = 'winners'" :class="infoTab === 'winners' ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'" class="flex-1 py-2.5 px-3 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer text-center">
-                    🏆 <span class="hidden sm:inline">Pemenang</span>
+                <button @click="infoTab = 'winners'" :class="infoTab === 'winners' ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'" class="flex-1 py-2.5 px-3 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer text-center flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    <span class="hidden sm:inline">Pemenang</span>
                 </button>
-                <button @click="infoTab = 'timeline'" :class="infoTab === 'timeline' ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'" class="flex-1 py-2.5 px-3 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer text-center">
-                    📅 <span class="hidden sm:inline">Timeline</span>
+                <button @click="infoTab = 'timeline'" :class="infoTab === 'timeline' ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'" class="flex-1 py-2.5 px-3 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer text-center flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span class="hidden sm:inline">Timeline</span>
                 </button>
             </div>
 
@@ -444,7 +519,9 @@
 
                 @if($eskuls->isEmpty())
                 <div x-show="loaded" class="text-center py-16 text-slate-500">
-                    <p class="text-5xl mb-4">🎟️</p>
+                    <div class="flex justify-center mb-4 text-purple-400">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    </div>
                     <p class="font-semibold text-lg">Belum ada data eskul.</p>
                     <p class="text-sm mt-2">Admin belum menambahkan profil ekstrakurikuler.</p>
                 </div>
@@ -457,11 +534,11 @@
                         <div class="relative h-40 overflow-hidden">
                             <img src="{{ $eskul->image_url }}" alt="{{ $eskul->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute top-3 left-3 w-11 h-11 rounded-xl bg-black/50 backdrop-blur flex items-center justify-center text-2xl">{{ $eskul->icon }}</div>
+                            <div class="absolute top-3 left-3 w-11 h-11 rounded-xl bg-black/50 backdrop-blur flex items-center justify-center text-2xl">{!! $eskul->icon !!}</div>
                         </div>
                         @else
                         <div class="h-28 bg-gradient-to-br from-purple-950/60 to-slate-900 flex items-center justify-center text-5xl">
-                            {{ $eskul->icon }}
+                            {!! $eskul->icon !!}
                         </div>
                         @endif
 
@@ -471,7 +548,10 @@
                                 <p class="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">{{ $eskul->description }}</p>
                             </div>
                             @if($eskul->achievements)
-                            <p class="text-xs text-yellow-400 font-semibold">🏅 {{ $eskul->achievements }}</p>
+                            <p class="text-xs text-purple-400 font-semibold flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                {{ $eskul->achievements }}
+                            </p>
                             @endif
                             <button @click="selectedEskul = {{ json_encode([
                                 'name'         => $eskul->name,
@@ -511,7 +591,9 @@
                 <div x-show="loaded" x-transition class="max-w-4xl mx-auto">
                     @if($winners->isEmpty())
                     <div class="text-center py-16 text-slate-500">
-                        <p class="text-5xl mb-4">🏆</p>
+                        <div class="flex justify-center mb-4 text-yellow-400">
+                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        </div>
                         <p class="font-semibold text-lg">Belum ada data pemenang.</p>
                         <p class="text-sm mt-2">Admin belum menambahkan daftar pemenang.</p>
                     </div>
@@ -542,10 +624,12 @@
                                             @if($winner->image_path)
                                                 <img src="{{ $winner->image_url }}" alt="{{ $winner->name }}" class="w-9 h-9 rounded-full object-cover border border-slate-700">
                                             @else
-                                                <div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-base">🏅</div>
+                                                <div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                </div>
                                             @endif
                                         </td>
-                                        <td class="py-3 px-5 text-sm font-black text-yellow-400 whitespace-nowrap">{{ $winner->rank }}</td>
+                                        <td class="py-3 px-5 text-sm font-black text-purple-400 whitespace-nowrap">{{ $winner->rank }}</td>
                                         <td class="py-3 px-5 text-sm font-bold text-slate-100 whitespace-nowrap">{{ $winner->name }}</td>
                                         <td class="py-3 px-5 text-sm text-slate-300 hidden sm:table-cell">{{ $winner->school }}</td>
                                         <td class="py-3 px-5 text-xs text-cyan-400 font-semibold hidden md:table-cell">{{ $winner->category }}</td>
@@ -579,7 +663,9 @@
 
                 @if($timelines->isEmpty())
                 <div x-show="loaded" class="text-center py-16 text-slate-500">
-                    <p class="text-5xl mb-4">📅</p>
+                    <div class="flex justify-center mb-4 text-cyan-400">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
                     <p class="font-semibold text-lg">Belum ada data timeline.</p>
                     <p class="text-sm mt-2">Admin belum menambahkan riwayat SPECTA.</p>
                 </div>
@@ -647,7 +733,7 @@
                 <button
                     @click="selectedEskul = null"
                     class="absolute top-3 right-3 z-20 bg-slate-950/80 border border-white/10 hover:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer"
-                >✕</button>
+                ><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></button>
 
                 <!-- Cover image -->
                 <template x-if="selectedEskul && selectedEskul.image_url">
@@ -700,14 +786,15 @@
                         <template x-if="selectedEskul && selectedEskul.achievements">
                             <div>
                                 <h4 class="text-xs uppercase text-slate-500 tracking-widest font-bold mb-1.5">Prestasi Unggulan</h4>
-                                <p class="text-yellow-400 font-bold" x-text="selectedEskul.achievements"></p>
+                                <p class="text-purple-400 font-bold" x-text="selectedEskul.achievements"></p>
                             </div>
                         </template>
                         <template x-if="selectedEskul && selectedEskul.contact">
                             <div>
                                 <h4 class="text-xs uppercase text-slate-500 tracking-widest font-bold mb-1.5">Narahubung (WA)</h4>
                                 <a :href="'https://wa.me/' + selectedEskul.contact.replace(/[^0-9]/g, '')" target="_blank" class="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-semibold">
-                                    💬 <span x-text="selectedEskul.contact"></span>
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    <span x-text="selectedEskul.contact"></span>
                                 </a>
                             </div>
                         </template>
@@ -747,7 +834,11 @@
 
                 <!-- STATE: START -->
                 <div x-show="gameState === 'start'" x-transition class="text-center space-y-6 my-auto">
-                    <div class="text-6xl animate-pulse">🌌</div>
+                    <div class="flex justify-center">
+                        <div class="w-24 h-24 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center animate-pulse">
+                            <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        </div>
+                    </div>
                     <h3 class="text-2xl font-bold text-slate-100">Siap Menjelajahi Lorong Waktu SPECTA?</h3>
                     <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
                         Pertanyaan kuis bersumber dari data ekstrakurikuler SMANSA dan timeline sejarah yang ada di atas. Jawablah dengan bijak!
@@ -786,8 +877,8 @@
 
                 <!-- STATE: CORRECT ANSWER BANNER -->
                 <div x-show="gameState === 'correct'" x-transition class="text-center space-y-6 my-auto">
-                    <div class="w-20 h-20 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center text-4xl mx-auto animate-bounce">
-                        ✨
+                    <div class="w-20 h-20 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto animate-bounce">
+                        <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <h3 class="text-2xl font-black text-green-400 tracking-wide">Jawaban Kamu Benar!</h3>
                     <p class="text-slate-300 text-sm max-w-md mx-auto leading-relaxed">
@@ -801,7 +892,7 @@
                 <!-- STATE: FLASHBACK (INCORRECT ANSWER STORY) -->
                 <div x-show="gameState === 'flashback'" x-transition class="space-y-6 my-auto">
                     <div class="flex items-center gap-3 text-red-400 border-b border-red-500/20 pb-3">
-                        <span class="text-3xl">📖</span>
+                        <svg class="w-8 h-8 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                         <div>
                             <h3 class="text-lg font-bold">Jawaban Kurang Tepat!</h3>
                             <p class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Story & Flashback Mode</p>
@@ -813,8 +904,9 @@
                         <p class="text-sm text-slate-300 leading-relaxed" x-text="getCurrentQuestion().flashbackText"></p>
                     </div>
 
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        💡 Membaca kisah masa lalu akan membantumu memahami esensi sesungguhnya dari program SPECTA.
+                    <p class="text-xs text-slate-500 leading-relaxed flex items-start gap-2">
+                        <svg class="w-4 h-4 text-slate-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        Membaca kisah masa lalu akan membantumu memahami esensi sesungguhnya dari program SPECTA.
                     </p>
 
                     <button @click="nextQuestion()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/50 rounded-xl font-bold text-slate-300 transition-all cursor-pointer text-xs uppercase tracking-widest">
@@ -824,7 +916,11 @@
 
                 <!-- STATE: FINISHED -->
                 <div x-show="gameState === 'finished'" x-transition class="text-center space-y-6 my-auto">
-                    <div class="text-6xl">🏆</div>
+                    <div class="flex justify-center">
+                        <div class="w-24 h-24 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        </div>
+                    </div>
                     <h3 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 tracking-wide">Kuis Selesai!</h3>
                     
                     <div class="bg-slate-950 border border-white/5 rounded-2xl p-6 max-w-sm mx-auto space-y-2">
@@ -838,7 +934,8 @@
                             Ulangi Kuis
                         </button>
                         <a href="{{ route('tickets.index') }}" class="flex-[1.5] py-3.5 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest shadow-md">
-                            🎟️ Amankan Tiket
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                            Amankan Tiket
                         </a>
                     </div>
                 </div>
@@ -889,7 +986,7 @@
                         <img src="{{ $doc->file_url }}" alt="{{ $doc->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     @else
                         <div class="w-full h-full bg-slate-900 flex items-center justify-center">
-                            <span class="text-5xl">🎬</span>
+                            <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                         </div>
                     @endif
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
@@ -914,15 +1011,25 @@
             <!-- Static placeholders -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
                 @php $placeholders = [
-                    ['emoji'=>'📸','label'=>'Malam Puncak SPECTA','sub'=>'Kemeriahan yang tak terlupakan','span'=>'md:col-span-2 md:row-span-2','color'=>'hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]','bg'=>'from-slate-800 to-slate-900'],
-                    ['emoji'=>'🎸','label'=>'Live Performance','sub'=>'Penampilan band & artis','span'=>'','color'=>'hover:border-purple-500/50 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]','bg'=>'from-purple-950/60 to-slate-900'],
-                    ['emoji'=>'🎭','label'=>'Teater Ekskul','sub'=>'Pentas seni & drama','span'=>'','color'=>'hover:border-pink-500/50 hover:shadow-[0_0_25px_rgba(236,72,153,0.25)]','bg'=>'from-pink-950/40 to-slate-900'],
-                    ['emoji'=>'🏅','label'=>'Pembagian Hadiah','sub'=>'Penghargaan para juara','span'=>'md:col-span-2','color'=>'hover:border-blue-500/50 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]','bg'=>'from-blue-950/40 to-slate-900'],
+                    ['emoji'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3"/></svg>','label'=>'Malam Puncak SPECTA','sub'=>'Kemeriahan yang tak terlupakan','span'=>'md:col-span-2 md:row-span-2','color'=>'hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]','bg'=>'from-slate-800 to-slate-900'],
+                    ['emoji'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19.59 3H22v2h-1.59l-5.29 5.29l-1.41-1.39zM12 9c.26 0 .5.1.71.3l2 2c.18.2.29.43.29.7l-.1.4l-4 8c-.19.35-.54.53-.9.53c-.35 0-.71-.18-.89-.53l-1.86-3.7l-3.7-1.8c-.37-.2-.55-.55-.55-.9s.18-.7.55-.9l8-4c.14-.1.29-.1.45-.1m-2.65 2.82l-.7.68l2.85 2.85l.68-.7zm-1.41 1.41l-.71.71l2.83 2.83l.71-.71z"/></svg>','label'=>'Live Performance','sub'=>'Penampilan band & artis','span'=>'','color'=>'hover:border-purple-500/50 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]','bg'=>'from-purple-950/60 to-slate-900'],
+                    ['emoji'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M8.11 19.45a6.95 6.95 0 0 1-4.4-5.1L2.05 6.54c-.24-1.08.45-2.14 1.53-2.37l9.77-2.07l.03-.01c1.07-.21 2.12.48 2.34 1.54l.35 1.67l4.35.93h.03c1.05.24 1.73 1.3 1.51 2.36l-1.66 7.82a6.993 6.993 0 0 1-8.3 5.38a6.9 6.9 0 0 1-3.89-2.34M20 8.18L10.23 6.1l-1.66 7.82v.03c-.57 2.68 1.16 5.32 3.85 5.89s5.35-1.15 5.92-3.84zm-4 8.32a2.96 2.96 0 0 1-3.17 1.39a2.97 2.97 0 0 1-2.33-2.55zM8.47 5.17L4 6.13l1.66 7.81l.01.03c.15.71.45 1.35.86 1.9c-.1-.77-.08-1.57.09-2.37l.43-2c-.45-.08-.84-.33-1.05-.69c.06-.61.56-1.15 1.25-1.31h.25l.78-3.81c.04-.19.1-.36.19-.52m6.56 7.06c.32-.53 1-.81 1.69-.66c.69.14 1.19.67 1.28 1.29c-.33.52-1 .8-1.7.64c-.69-.13-1.19-.66-1.27-1.27m-4.88-1.04c.32-.53.99-.81 1.68-.66c.67.14 1.2.68 1.28 1.29c-.33.52-1 .81-1.69.68c-.69-.17-1.19-.7-1.27-1.31m1.82-6.76l1.96.42l-.16-.8z"/></svg>','label'=>'Teater Ekskul','sub'=>'Pentas seni & drama','span'=>'','color'=>'hover:border-pink-500/50 hover:shadow-[0_0_25px_rgba(236,72,153,0.25)]','bg'=>'from-pink-950/40 to-slate-900'],
+                    ['emoji'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4v2l5.81 4.36a7.004 7.004 0 0 0-4.46 8.84a6.996 6.996 0 0 0 8.84 4.46a7 7 0 0 0 0-13.3L20 4zm-5.06 17.5L12 17.78L9.06 19.5l.78-3.33l-2.59-2.24l3.41-.29L12 10.5l1.34 3.14l3.41.29l-2.59 2.24z"/></svg>','label'=>'Pembagian Hadiah','sub'=>'Penghargaan para juara','span'=>'md:col-span-2','color'=>'hover:border-blue-500/50 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]','bg'=>'from-blue-950/40 to-slate-900'],
                 ]; @endphp
                 @foreach($placeholders as $i => $ph)
                 <div class="{{ $ph['span'] }} group relative rounded-3xl overflow-hidden border border-white/10 {{ $ph['color'] }} transition-all duration-500" data-aos="fade-up" data-aos-delay="{{ $i * 100 }}">
                     <div class="absolute inset-0 bg-gradient-to-br {{ $ph['bg'] }}"></div>
-                    <div class="absolute inset-0 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform duration-700">{{ $ph['emoji'] }}</div>
+                    <div class="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                        @if($ph['emoji'] === '<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3"/></svg>')
+                        <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        @elseif($ph['emoji'] === '<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19.59 3H22v2h-1.59l-5.29 5.29l-1.41-1.39zM12 9c.26 0 .5.1.71.3l2 2c.18.2.29.43.29.7l-.1.4l-4 8c-.19.35-.54.53-.9.53c-.35 0-.71-.18-.89-.53l-1.86-3.7l-3.7-1.8c-.37-.2-.55-.55-.55-.9s.18-.7.55-.9l8-4c.14-.1.29-.1.45-.1m-2.65 2.82l-.7.68l2.85 2.85l.68-.7zm-1.41 1.41l-.71.71l2.83 2.83l.71-.71z"/></svg>')
+                        <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                        @elseif($ph['emoji'] === '<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M8.11 19.45a6.95 6.95 0 0 1-4.4-5.1L2.05 6.54c-.24-1.08.45-2.14 1.53-2.37l9.77-2.07l.03-.01c1.07-.21 2.12.48 2.34 1.54l.35 1.67l4.35.93h.03c1.05.24 1.73 1.3 1.51 2.36l-1.66 7.82a6.993 6.993 0 0 1-8.3 5.38a6.9 6.9 0 0 1-3.89-2.34M20 8.18L10.23 6.1l-1.66 7.82v.03c-.57 2.68 1.16 5.32 3.85 5.89s5.35-1.15 5.92-3.84zm-4 8.32a2.96 2.96 0 0 1-3.17 1.39a2.97 2.97 0 0 1-2.33-2.55zM8.47 5.17L4 6.13l1.66 7.81l.01.03c.15.71.45 1.35.86 1.9c-.1-.77-.08-1.57.09-2.37l.43-2c-.45-.08-.84-.33-1.05-.69c.06-.61.56-1.15 1.25-1.31h.25l.78-3.81c.04-.19.1-.36.19-.52m6.56 7.06c.32-.53 1-.81 1.69-.66c.69.14 1.19.67 1.28 1.29c-.33.52-1 .8-1.7.64c-.69-.13-1.19-.66-1.27-1.27m-4.88-1.04c.32-.53.99-.81 1.68-.66c.67.14 1.2.68 1.28 1.29c-.33.52-1 .81-1.69.68c-.69-.17-1.19-.7-1.27-1.31m1.82-6.76l1.96.42l-.16-.8z"/></svg>')
+                        <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        @else
+                        <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        @endif
+                    </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 right-4">
                         <h3 class="font-bold text-white text-sm">{{ $ph['label'] }}</h3>
@@ -965,7 +1072,9 @@
                         @if($merch->image_url)
                             <img src="{{ $merch->image_url }}" alt="{{ $merch->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         @else
-                            <div class="text-4xl opacity-20 group-hover:scale-110 transition-transform duration-500">🛍️</div>
+                            <div class="flex items-center justify-center w-12 h-12 text-slate-600">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            </div>
                         @endif
                     </div>
 
@@ -1113,18 +1222,25 @@
 
             getFeedbackText() {
                 if (this.score === this.questions.length) {
-                    return "Sempurna! Kamu adalah Velorans Sejati! 🌟";
+                    return "Sempurna! Kamu adalah Velorans Sejati!";
                 } else if (this.score >= 3) {
-                    return "Bagus sekali! Kamu sangat mengenal SPECTA! 👍";
+                    return "Bagus sekali! Kamu sangat mengenal SPECTA!";
                 } else {
-                    return "Ayo pelajari lebih lanjut timeline di atas and coba lagi! 📖";
+                    return "Ayo pelajari lebih lanjut timeline di atas and coba lagi!";
                 }
             }
         };
     }
 
+    // Disable automatic scroll restoration
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    // Scroll to top immediately
+    window.scrollTo(0, 0);
+
     document.addEventListener('DOMContentLoaded', function () {
-        // Prevent browser from remembering scroll position on reload
+        // Double check on DOM load
         if (!window.location.hash) {
             window.scrollTo(0, 0);
         }

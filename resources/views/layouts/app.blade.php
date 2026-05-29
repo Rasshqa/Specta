@@ -21,6 +21,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    {{-- Iconify – Icon API (200,000+ icons) --}}
+
+
     {{-- x-cloak: hide Alpine.js elements until JS is loaded --}}
     <style>[x-cloak] { display: none !important; }</style>
 </head>

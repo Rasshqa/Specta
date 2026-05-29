@@ -157,7 +157,7 @@
 
         <!-- Greeting -->
         <p class="greeting">
-            Halo, <strong>{{ $transaction->buyer_name }}</strong>! 🎉<br><br>
+            Halo, <strong>{{ $transaction->buyer_name }}</strong>! <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m14.53 1.45l-1.08 1.08l1.6 1.6q.33.375.33.87c0 .495-.11.64-.33.86L11.5 9.47l1 1.08l3.63-3.61c.53-.59.79-1.24.79-1.94s-.26-1.36-.79-1.95zm-3.98 2.02L9.47 4.55l.61.56c.22.22.33.52.33.89s-.11.67-.33.89l-.61.56l1.08 1.08l.56-.61c.53-.59.8-1.23.8-1.92c0-.72-.27-1.37-.8-1.97zM21 5.06c-.69 0-1.33.27-1.92.8l-5.63 5.64l1.08 1l5.58-5.56c.25-.25.55-.38.89-.38s.64.13.89.38l.61.61l1.03-1.08l-.56-.61c-.59-.53-1.25-.8-1.97-.8M7 8L2 22l14-5zm12 3.06c-.7 0-1.34.27-1.94.8l-1.59 1.59l1.08 1.08l1.59-1.59c.25-.25.53-.38.86-.38s.63.13.88.38l1.62 1.59l1.05-1.03l-1.6-1.64c-.59-.53-1.25-.8-1.95-.8"/></svg><br><br>
             Selamat! Pembayaran kamu telah <strong>berhasil dikonfirmasi</strong>.
             E-Tiket resmi kamu terlampir dalam email ini dalam format PDF.
             Tunjukkan QR Code yang ada di PDF tersebut kepada petugas di pintu masuk saat hari acara.
@@ -165,7 +165,7 @@
 
         <!-- Success Banner -->
         <div class="success-banner">
-            <div class="icon">🎟️</div>
+            <div class="icon"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M15.58 16.8L12 14.5l-3.58 2.3l1.08-4.12L6.21 10l4.25-.26L12 5.8l1.54 3.94l4.25.26l-3.29 2.68M20 12a2 2 0 0 1 2-2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2a2 2 0 0 1-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 1-2-2"/></svg></div>
             <h2>Pembayaran Dikonfirmasi!</h2>
             <p>E-Tiket kamu sudah siap. Simpan PDF ini baik-baik.</p>
         </div>
@@ -221,7 +221,7 @@
         <p>
             Email ini dikirim secara otomatis oleh sistem SPECTA XXI.<br>
             Jika ada pertanyaan, hubungi panitia via WhatsApp.<br><br>
-            &copy; {{ date('Y') }} SPECTA XXI · SMAN 1 Cianjur · Sampai jumpa di acara, Veloran! ✨
+            &copy; {{ date('Y') }} SPECTA XXI · SMAN 1 Cianjur · Sampai jumpa di acara, Veloran! <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25M9 4L6.5 9.5L1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5M19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.26"/></svg>
         </p>
     </div>
 

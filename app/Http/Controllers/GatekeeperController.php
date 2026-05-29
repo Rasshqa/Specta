@@ -8,61 +8,71 @@ use Illuminate\Http\Request;
 class GatekeeperController extends Controller
 {
     /**
-     * Display the scanner view.
+     * Display the cyberpunk gate scanner view.
+     * Accessible by admin users.
      */
     public function index()
     {
-        return view('gatekeeper.scanner');
+        return view('admin.gatekeeper');
     }
 
     /**
-     * Process the ticket scan.
+     * Process a ticket scan via AJAX.
+     * Returns JSON: valid | already_scanned | invalid
      */
     public function scan(Request $request)
     {
         $request->validate([
-            'code' => 'required|string',
+            'code' => 'required|string|max:50',
         ]);
 
-        $code = $request->input('code');
+        $code = strtoupper(trim($request->input('code')));
 
-        // Find the ticket code and eager load the related transaction and ticket
-        $ticketCode = TicketCode::with(['transaction.ticket'])->where('unique_ticket_code', $code)->first();
+        // Find the ticket code with eager-loaded transaction and ticket
+        $ticketCode = TicketCode::with(['transaction.ticket'])
+            ->where('unique_ticket_code', $code)
+            ->first();
 
+        // ── Not found ────────────────────────────────────────────────────────
         if (!$ticketCode) {
             return response()->json([
-                'message' => 'Kode tiket tidak ditemukan atau palsu.',
+                'status'  => 'invalid',
+                'message' => 'Kode tiket tidak ditemukan atau tidak valid.',
             ], 404);
         }
 
         $transaction = $ticketCode->transaction;
 
-        // Ensure the transaction is actually confirmed (success)
-        if ($transaction->status !== 'success') {
+        // ── Transaction not SUCCESS (note: uppercase STATUS enum) ─────────────
+        if ($transaction->status !== 'SUCCESS') {
             return response()->json([
-                'message' => 'Tiket ini belum lunas atau transaksi dibatalkan.',
+                'status'  => 'invalid',
+                'message' => 'Tiket ini belum dikonfirmasi pembayarannya.',
             ], 400);
         }
 
-        // If the ticket was already scanned
+        // ── Already scanned ───────────────────────────────────────────────────
         if ($ticketCode->is_scanned) {
             return response()->json([
-                'message' => 'Tiket ini sudah di-scan sebelumnya!',
-                'scanned_at' => $ticketCode->scanned_at->format('d M Y H:i:s'),
+                'status'     => 'duplicate',
+                'message'    => 'Tiket ini sudah di-scan sebelumnya!',
                 'buyer_name' => $transaction->buyer_name,
-            ], 409); // Conflict
+                'scanned_at' => $ticketCode->scanned_at?->format('d M Y H:i:s'),
+            ], 409);
         }
 
-        // Valid and first time scan, mark as scanned
-        $ticketCode->is_scanned = true;
-        $ticketCode->scanned_at = now();
-        $ticketCode->save();
+        // ── Valid — mark as scanned ───────────────────────────────────────────
+        $ticketCode->update([
+            'is_scanned' => true,
+            'scanned_at' => now(),
+        ]);
 
         return response()->json([
-            'message' => 'Tiket Valid!',
-            'buyer_name' => $transaction->buyer_name,
-            'ticket_name' => $transaction->ticket->ticket_name ?? $transaction->ticket->name,
-            'invoice' => $transaction->invoice_number,
+            'status'      => 'valid',
+            'message'     => 'Tiket Valid! Selamat datang.',
+            'buyer_name'  => $transaction->buyer_name,
+            'ticket_name' => $transaction->ticket->ticket_name ?? 'Tiket Reguler',
+            'invoice'     => $transaction->invoice_number,
         ], 200);
     }
 }

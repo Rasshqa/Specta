@@ -41,7 +41,7 @@
                     <p class="text-slate-500 text-sm mt-1">Ringkasan operasional SPECTA XXI: REVELIORA</p>
                 </div>
                 <button onclick="window.dispatchEvent(new CustomEvent('open-scanner'))" class="w-full sm:w-auto justify-center bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-all">
-                    <span>📱</span> Scan Tiket QR
+                    <span><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M17 19H7V5h10m0-4H7c-1.11 0-2 .89-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2"/></svg></span> Scan Tiket QR
                 </button>
             </div>
 
@@ -49,19 +49,19 @@
             <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
                 @php
                     $statCards = [
-                        ['label'=>'Transaksi','value'=> $stats['total_transactions'],'icon'=>'📊','color'=>'purple'],
+                        ['label'=>'Transaksi','value'=> $stats['total_transactions'],'icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M22 21H2V3h2v16h2v-9h4v9h2V6h4v13h2v-5h4z"/></svg>','color'=>'purple'],
                         ['label'=>'Pending','value'=> $stats['pending_transactions'],'icon'=>'⏳','color'=>'yellow'],
-                        ['label'=>'Sukses','value'=> $stats['success_transactions'],'icon'=>'✅','color'=>'green'],
-                        ['label'=>'Tiket Terjual','value'=> $stats['tickets_sold'],'icon'=>'🎟️','color'=>'cyan'],
-                        ['label'=>'QR Generated','value'=> $stats['qr_generated'],'icon'=>'🎫','color'=>'indigo'],
-                        ['label'=>'QR Scanned','value'=> $stats['qr_scanned'],'icon'=>'📱','color'=>'emerald'],
+                        ['label'=>'Sukses','value'=> $stats['success_transactions'],'icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg>','color'=>'green'],
+                        ['label'=>'Tiket Terjual','value'=> $stats['tickets_sold'],'icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M15.58 16.8L12 14.5l-3.58 2.3l1.08-4.12L6.21 10l4.25-.26L12 5.8l1.54 3.94l4.25.26l-3.29 2.68M20 12a2 2 0 0 1 2-2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2a2 2 0 0 1-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 1-2-2"/></svg>','color'=>'cyan'],
+                        ['label'=>'QR Generated','value'=> $stats['qr_generated'],'icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2a2 2 0 0 1-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 1-2-2a2 2 0 0 1 2-2V6a2 2 0 0 0-2-2zm0 2h16v2.54c-1.24.71-2 2.03-2 3.46s.76 2.75 2 3.46V18H4v-2.54c1.24-.71 2-2.03 2-3.46s-.76-2.75-2-3.46z"/></svg>','color'=>'indigo'],
+                        ['label'=>'QR Scanned','value'=> $stats['qr_scanned'],'icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M17 19H7V5h10m0-4H7c-1.11 0-2 .89-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2"/></svg>','color'=>'emerald'],
                     ];
                 @endphp
                 @foreach($statCards as $card)
                 <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-4 sm:p-5 hover:border-{{ $card['color'] }}-500/40 transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $loop->index * 80 }}">
                     <div class="flex items-center justify-between mb-2 sm:mb-3">
                         <p class="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider sm:tracking-widest">{{ $card['label'] }}</p>
-                        <span class="text-lg sm:text-xl">{{ $card['icon'] }}</span>
+                        <span class="text-lg sm:text-xl">{!! $card['icon'] !!}</span>
                     </div>
                     <p class="text-2xl sm:text-3xl font-black text-slate-100">{{ number_format($card['value']) }}</p>
                 </div>
@@ -136,9 +136,9 @@
                                 <td class="px-4 sm:px-6 py-3 sm:py-4" data-label="Status">
                                     @php
                                         $badgeMap = [
-                                            'pending' => 'bg-yellow-900/40 text-yellow-400 border-yellow-600/40',
-                                            'success' => 'bg-green-900/40 text-green-400 border-green-600/40',
-                                            'expired' => 'bg-red-900/40 text-red-400 border-red-600/40',
+                                            'PENDING_PROOF' => 'bg-cyan-900/40 text-cyan-400 border-cyan-600/40',
+                                            'SUCCESS'       => 'bg-green-900/40 text-green-400 border-green-600/40',
+                                            'REJECTED'      => 'bg-red-900/40 text-red-400 border-red-600/40',
                                         ];
                                     @endphp
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold border {{ $badgeMap[$order->status] ?? '' }}">
@@ -148,7 +148,7 @@
                                 <td class="px-4 sm:px-6 py-3 sm:py-4" data-label="Aksi">
                                     @if($order->isPending())
                                     <div class="flex items-center gap-2">
-                                        <form method="POST" action="{{ route('admin.transaction.confirm', $order->invoice_number) }}">
+                                        <form method="POST" action="{{ route('admin.transaction.approve', $order->invoice_number) }}">
                                             @csrf
                                             <button
                                                 id="btn-confirm-{{ $order->id }}"
@@ -157,14 +157,14 @@
                                                 onclick="return confirm('Konfirmasi pembayaran {{ $order->invoice_number }}?')"
                                             >Konfirmasi</button>
                                         </form>
-                                        <form method="POST" action="{{ route('admin.transaction.expire', $order->invoice_number) }}">
+                                        <form method="POST" action="{{ route('admin.transaction.reject', $order->invoice_number) }}">
                                             @csrf
                                             <button
                                                 id="btn-expire-{{ $order->id }}"
                                                 type="submit"
                                                 class="text-xs bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/40 px-3 py-1.5 rounded-lg transition-all"
-                                                onclick="return confirm('Tandai transaksi ini sebagai expired?')"
-                                            >Expire</button>
+                                                onclick="return confirm('Tolak transaksi ini?')"
+                                            >Tolak</button>
                                         </form>
                                     </div>
                                     @else
@@ -193,7 +193,7 @@
          style="display: none;">
         
         <div @click.away="closeModal()" class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
-            <button @click="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+            <button @click="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></button>
             
             <h2 class="text-xl font-bold mb-2 text-center">Scan Tiket QR</h2>
             <p class="text-xs text-slate-500 text-center mb-6">Arahkan kamera ke QR Code milik pengunjung.</p>

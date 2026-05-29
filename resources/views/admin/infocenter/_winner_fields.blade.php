@@ -6,7 +6,7 @@
 
 <div>
     <label for="{{ $prefix }}rank" class="block text-xs text-slate-400 font-semibold mb-1">Prestasi *</label>
-    <input type="text" id="{{ $prefix }}rank" name="rank" value="{{ old('rank', $w?->rank) }}" required class="w-full bg-slate-950 border border-slate-700 text-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-yellow-500 transition-all" placeholder="🏆 Juara 1" autocomplete="off">
+    <input type="text" id="{{ $prefix }}rank" name="rank" value="{{ old('rank', $w?->rank) }}" required class="w-full bg-slate-950 border border-slate-700 text-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-yellow-500 transition-all" placeholder="<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2c-.9 0-2 1-2 2H8c0-1-1.1-2-2-2H2v9c0 1 1 2 2 2h2.2c.4 2 1.7 3.7 4.8 4v2.08C8 19.54 8 22 8 22h8s0-2.46-3-2.92V17c3.1-.3 4.4-2 4.8-4H20c1 0 2-1 2-2V2zM6 11H4V4h2zm14 0h-2V4h2z"/></svg> Juara 1" autocomplete="off">
 </div>
 
 <div>

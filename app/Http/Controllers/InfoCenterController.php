@@ -14,7 +14,11 @@ class InfoCenterController extends Controller
 
     public function eskulIndex()
     {
-        $eskuls = EskulProfile::orderBy('sort_order')->get();
+        $eskuls = cache()->remember('admin_eskul_profiles', 86400, function () {
+            return EskulProfile::select(['id', 'name', 'icon', 'description', 'detail', 'schedule', 'contact', 'activities', 'achievements', 'is_active', 'sort_order', 'image_path'])
+                ->orderBy('sort_order')
+                ->get();
+        });
         return view('admin.infocenter.eskul', compact('eskuls'));
     }
 
@@ -42,6 +46,7 @@ class InfoCenterController extends Controller
         unset($data['image']);
 
         EskulProfile::create($data);
+        cache()->forget('admin_eskul_profiles');
         return back()->with('success', 'Eskul berhasil ditambahkan.');
     }
 
@@ -70,6 +75,7 @@ class InfoCenterController extends Controller
         unset($data['image']);
 
         $eskul->update($data);
+        cache()->forget('admin_eskul_profiles');
         return back()->with('success', 'Eskul berhasil diperbarui.');
     }
 
@@ -77,6 +83,7 @@ class InfoCenterController extends Controller
     {
         if ($eskul->image_path) Storage::disk('public')->delete($eskul->image_path);
         $eskul->delete();
+        cache()->forget('admin_eskul_profiles');
         return back()->with('success', 'Eskul berhasil dihapus.');
     }
 
@@ -84,7 +91,11 @@ class InfoCenterController extends Controller
 
     public function winnersIndex()
     {
-        $winners = Winner::orderBy('sort_order')->get();
+        $winners = cache()->remember('admin_winners_list', 86400, function () {
+            return Winner::select(['id', 'rank', 'name', 'school', 'category', 'score', 'is_active', 'sort_order', 'image_path'])
+                ->orderBy('sort_order')
+                ->get();
+        });
         return view('admin.infocenter.winners', compact('winners'));
     }
 
@@ -109,6 +120,7 @@ class InfoCenterController extends Controller
         unset($data['image']);
 
         Winner::create($data);
+        cache()->forget('admin_winners_list');
         return back()->with('success', 'Pemenang berhasil ditambahkan.');
     }
 
@@ -134,6 +146,7 @@ class InfoCenterController extends Controller
         unset($data['image']);
 
         $winner->update($data);
+        cache()->forget('admin_winners_list');
         return back()->with('success', 'Pemenang berhasil diperbarui.');
     }
 
@@ -141,6 +154,7 @@ class InfoCenterController extends Controller
     {
         if ($winner->image_path) Storage::disk('public')->delete($winner->image_path);
         $winner->delete();
+        cache()->forget('admin_winners_list');
         return back()->with('success', 'Pemenang berhasil dihapus.');
     }
 
@@ -148,7 +162,11 @@ class InfoCenterController extends Controller
 
     public function docsIndex()
     {
-        $docs = \App\Models\Documentation::latest()->get();
+        $docs = cache()->remember('admin_docs_list', 3600, function () {
+            return \App\Models\Documentation::select(['id', 'title', 'description', 'event_date', 'file_path', 'file_type', 'is_active', 'created_at'])
+                ->latest()
+                ->get();
+        });
         return view('admin.infocenter.docs', compact('docs'));
     }
 
@@ -209,6 +227,7 @@ class InfoCenterController extends Controller
             'file_type'   => $type,
             'is_active'   => true,
         ]);
+        cache()->forget('admin_docs_list');
 
         return back()->with('success', 'Dokumentasi berhasil ditambahkan.');
     }
@@ -219,6 +238,7 @@ class InfoCenterController extends Controller
             Storage::disk('public')->delete($documentation->file_path);
         }
         $documentation->delete();
+        cache()->forget('admin_docs_list');
         return back()->with('success', 'Dokumentasi berhasil dihapus.');
     }
 

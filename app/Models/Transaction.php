@@ -26,6 +26,7 @@ class Transaction extends Model
         'unique_code',
         'total_price',
         'status',
+        'payment_proof',
     ];
 
     /**
@@ -73,7 +74,7 @@ class Transaction extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === 'PENDING_PROOF';
     }
 
     /**
@@ -81,7 +82,7 @@ class Transaction extends Model
      */
     public function isSuccess(): bool
     {
-        return $this->status === 'success';
+        return $this->status === 'SUCCESS';
     }
 
     /**
@@ -89,7 +90,7 @@ class Transaction extends Model
      */
     public function isExpired(): bool
     {
-        return $this->status === 'expired';
+        return $this->status === 'REJECTED';
     }
 
     /**
@@ -97,7 +98,7 @@ class Transaction extends Model
      */
     public function isDownloadable(): bool
     {
-        return $this->status === 'success';
+        return $this->status === 'SUCCESS';
     }
 
     /**

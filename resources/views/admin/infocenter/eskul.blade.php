@@ -37,7 +37,7 @@
                         <p class="text-slate-500 text-sm mt-1">Kelola profil ekstrakurikuler yang tampil di landing page.</p>
                     </div>
                     <button @click="showAdd = !showAdd" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-purple-900/30 cursor-pointer">
-                        <span x-text="showAdd ? '✕ Batal' : '+ Tambah Eskul'"></span>
+                        <span x-text="showAdd ? ' Batal' : '+ Tambah Eskul'"></span>
                     </button>
                 </div>
 
@@ -64,7 +64,7 @@
                         <img src="{{ $eskul->image_url }}" alt="{{ $eskul->name }}" class="w-full h-36 object-cover">
                         @else
                         <div class="w-full h-36 bg-gradient-to-br from-purple-950/60 to-slate-900 flex items-center justify-center text-5xl">
-                            {{ $eskul->icon }}
+                            {!! $eskul->icon !!}
                         </div>
                         @endif
 
@@ -83,7 +83,7 @@
                             <div class="flex gap-2 pt-1">
                                 {{-- Edit toggle --}}
                                 <button @click="editId = editId === {{ $eskul->id }} ? null : {{ $eskul->id }}" class="flex-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-xl font-bold transition-all cursor-pointer">
-                                    ✏️ Edit
+                                    <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83l3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75z"/></svg> Edit
                                 </button>
                                 {{-- Delete --}}
                                 <form action="{{ route('admin.infocenter.eskul.destroy', $eskul) }}" method="POST" onsubmit="return confirm('Hapus data eskul ini?')" class="m-0 p-0 flex flex-shrink-0">
@@ -93,7 +93,7 @@
                                        type="submit" 
                                        class="px-4 text-xs bg-red-900/40 hover:bg-red-800/60 text-red-400 py-2 rounded-xl font-bold transition-all cursor-pointer border border-red-800/40"
                                     >
-                                        🗑️
+                                        <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6z"/></svg>
                                     </button>
                                 </form>                            </div>
 
@@ -111,7 +111,7 @@
                     </div>
                     @empty
                     <div class="md:col-span-3 text-center py-16 text-slate-500">
-                        <p class="text-4xl mb-3">🎯</p>
+                        <p class="text-4xl mb-3"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 2v2.07A8 8 0 0 0 4.07 11H2v2h2.07A8 8 0 0 0 11 19.93V22h2v-2.07A8 8 0 0 0 19.93 13H22v-2h-2.07A8 8 0 0 0 13 4.07V2m-2 4.08V8h2V6.09c2.5.41 4.5 2.41 4.92 4.91H16v2h1.91c-.41 2.5-2.41 4.5-4.91 4.92V16h-2v1.91C8.5 17.5 6.5 15.5 6.08 13H8v-2H6.09C6.5 8.5 8.5 6.5 11 6.08M12 11a1 1 0 0 0-1 1a1 1 0 0 0 1 1a1 1 0 0 0 1-1a1 1 0 0 0-1-1"/></svg></p>
                         <p class="font-semibold">Belum ada data eskul.</p>
                         <p class="text-sm mt-1">Klik "+ Tambah Eskul" untuk memulai.</p>
                     </div>

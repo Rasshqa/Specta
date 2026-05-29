@@ -38,7 +38,7 @@
     <main class="max-w-7xl mx-auto px-6 pb-32 relative z-10">
         @if($merchandises->isEmpty())
         <div class="text-center py-24 text-slate-500">
-            <div class="text-6xl mb-6 opacity-50">🛍️</div>
+            <div class="text-6xl mb-6 opacity-50"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2m-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3m7 17H5V8h14zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3"/></svg></div>
             <h3 class="text-2xl font-bold text-slate-300 mb-2">Belum ada merchandise</h3>
             <p>Admin sedang menyiapkan koleksi terbaik untukmu.</p>
         </div>
@@ -59,7 +59,7 @@
                     @if($merch->image_url)
                         <img src="{{ $merch->image_url }}" alt="{{ $merch->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
-                        <div class="text-4xl opacity-20 group-hover:scale-110 transition-transform duration-500">🛍️</div>
+                        <div class="text-4xl opacity-20 group-hover:scale-110 transition-transform duration-500"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2m-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3m7 17H5V8h14zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3"/></svg></div>
                     @endif
                 </div>
 
@@ -119,7 +119,7 @@
         >
             <!-- Close Button -->
             <button @click="showModal = false" class="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur border border-white/10 hover:bg-black rounded-full w-10 h-10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer">
-                ✕
+                <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
             </button>
 
             <!-- Image Side -->
@@ -128,7 +128,7 @@
                     <img :src="activeMerch.image_url" :alt="activeMerch.name" class="w-full h-full object-cover">
                 </template>
                 <template x-if="activeMerch && !activeMerch.image_url">
-                    <div class="text-7xl opacity-20">🛍️</div>
+                    <div class="text-7xl opacity-20"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2m-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3m7 17H5V8h14zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3"/></svg></div>
                 </template>
             </div>
 

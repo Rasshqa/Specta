@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\TicketCode;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -15,25 +16,50 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $stats = [
-            'total_transactions'   => Transaction::count(),
-            'pending_transactions' => Transaction::where('status', 'pending')->count(),
-            'success_transactions' => Transaction::where('status', 'success')->count(),
-            'expired_transactions' => Transaction::where('status', 'expired')->count(),
-            'total_revenue'        => Transaction::where('status', 'success')->sum('base_price'),
-            'tickets_sold'         => Transaction::where('status', 'success')->sum('quantity'),
-            'scanned_today'        => TicketCode::where('is_scanned', true)
-                                        ->whereDate('scanned_at', today())
-                                        ->count(),
-            'qr_generated'         => TicketCode::count(),
-            'qr_scanned'           => TicketCode::where('is_scanned', true)->count(),
-        ];
+        // One query for all transaction counts/sums instead of 5 separate queries
+        $stats = cache()->remember('admin_dashboard_stats', 60, function () {
+            $agg = Transaction::selectRaw("
+                COUNT(*) AS total_transactions,
+                SUM(CASE WHEN status = 'PENDING_PROOF' THEN 1 ELSE 0 END) AS pending_transactions,
+                SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) AS success_transactions,
+                SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END) AS expired_transactions,
+                SUM(CASE WHEN status = 'SUCCESS' THEN total_price ELSE 0 END) AS total_revenue,
+                SUM(CASE WHEN status = 'SUCCESS' THEN quantity ELSE 0 END) AS tickets_sold
+            ")->first();
 
-        $tickets       = Ticket::all();
-        $recentOrders  = Transaction::with('ticket')
-                            ->latest()
-                            ->limit(10)
-                            ->get();
+            $ticketAgg = TicketCode::selectRaw("
+                COUNT(*) AS qr_generated,
+                SUM(CASE WHEN is_scanned = 1 THEN 1 ELSE 0 END) AS qr_scanned,
+                SUM(CASE WHEN is_scanned = 1 AND DATE(scanned_at) = CURDATE() THEN 1 ELSE 0 END) AS scanned_today
+            ")->first();
+
+            return [
+                'total_transactions'   => (int) $agg->total_transactions,
+                'pending_transactions' => (int) $agg->pending_transactions,
+                'success_transactions' => (int) $agg->success_transactions,
+                'expired_transactions' => (int) $agg->expired_transactions,
+                'total_revenue'        => (float) $agg->total_revenue,
+                'tickets_sold'         => (int) $agg->tickets_sold,
+                'scanned_today'        => (int) $ticketAgg->scanned_today,
+                'qr_generated'         => (int) $ticketAgg->qr_generated,
+                'qr_scanned'           => (int) $ticketAgg->qr_scanned,
+            ];
+        });
+
+        // Cache ticket data (rarely changes)
+        $tickets = cache()->remember('admin_tickets_list', 3600, function () {
+            return Ticket::select(['id', 'ticket_name', 'price', 'remaining_quota'])->get();
+        });
+
+        // Select only columns needed by the view, avoid SELECT *
+        $recentOrders = Transaction::select([
+                'id', 'invoice_number', 'buyer_name', 'buyer_email',
+                'ticket_id', 'quantity', 'total_price', 'status', 'created_at'
+            ])
+            ->with(['ticket:id,ticket_name'])
+            ->latest()
+            ->limit(10)
+            ->get();
 
         return view('admin.dashboard', compact('stats', 'tickets', 'recentOrders'));
     }
@@ -43,7 +69,12 @@ class AdminController extends Controller
      */
     public function transactions(Request $request)
     {
-        $query = Transaction::with('ticket')->latest();
+        $query = Transaction::select([
+                'id', 'invoice_number', 'buyer_name', 'buyer_email', 'buyer_whatsapp',
+                'ticket_id', 'quantity', 'total_price', 'status', 'payment_proof', 'created_at'
+            ])
+            ->with(['ticket:id,ticket_name'])
+            ->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -63,54 +94,7 @@ class AdminController extends Controller
         return view('admin.transactions', compact('transactions'));
     }
 
-    /**
-     * Manually confirm (approve) a pending transaction.
-     * In production this would be triggered by a Moota webhook.
-     */
-    public function confirmTransaction(string $invoice)
-    {
-        $transaction = Transaction::with('ticket')
-            ->where('invoice_number', $invoice)
-            ->where('status', 'pending')
-            ->firstOrFail();
 
-        \DB::transaction(function () use ($transaction) {
-            $transaction->update(['status' => 'success']);
-
-            // Generate one TicketCode per quantity purchased
-            for ($i = 0; $i < $transaction->quantity; $i++) {
-                \App\Models\TicketCode::create([
-                    'transaction_id'     => $transaction->id,
-                    'unique_ticket_code' => $transaction->generateTicketCode($i),
-                    'is_scanned'         => false,
-                    'scanned_at'         => null,
-                ]);
-            }
-        });
-
-        // Dispatch job to generate PDF and send email
-        \App\Jobs\ProcessTicketPurchase::dispatch($transaction);
-
-        return back()->with('success', "Transaksi {$invoice} berhasil dikonfirmasi. Tiket telah di-generate.");
-    }
-
-    /**
-     * Mark a pending transaction as expired (manual action / scheduled job trigger).
-     */
-    public function expireTransaction(string $invoice)
-    {
-        $transaction = Transaction::where('invoice_number', $invoice)
-            ->where('status', 'pending')
-            ->firstOrFail();
-
-        \DB::transaction(function () use ($transaction) {
-            // Restore quota back to the ticket
-            $transaction->ticket()->increment('remaining_quota', $transaction->quantity);
-            $transaction->update(['status' => 'expired']);
-        });
-
-        return back()->with('success', "Transaksi {$invoice} telah ditandai expired. Kuota dikembalikan.");
-    }
 
     /**
      * Merchandise management index.
@@ -152,7 +136,7 @@ class AdminController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($merchandise->image) \Storage::disk('public')->delete($merchandise->image);
+            if ($merchandise->image) Storage::disk('public')->delete($merchandise->image);
             $data['image'] = $this->saveWebP($request->file('image'), 'merch');
         } else {
             unset($data['image']);
@@ -178,7 +162,9 @@ class AdminController extends Controller
     {
         $request->validate(['code' => 'required|string']);
 
-        $ticketCode = TicketCode::where('unique_ticket_code', $request->code)->first();
+        $ticketCode = TicketCode::with(['transaction:id,invoice_number,buyer_name,status'])
+            ->where('unique_ticket_code', $request->code)
+            ->first();
 
         if (!$ticketCode) {
             return response()->json([
@@ -238,7 +224,7 @@ class AdminController extends Controller
         $bytes = ob_get_clean();
         imagedestroy($image);
 
-        \Storage::disk('public')->put($dest, $bytes);
+        Storage::disk('public')->put($dest, $bytes);
         return $dest;
     }
 }

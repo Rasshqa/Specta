@@ -91,6 +91,8 @@
                 background-color: #13112a; z-index: 0;"></div>
 
 
+
+
     {{-- ================================================================
          HEADER — Logo SMANSA + Event Title + Ticket Index
     ================================================================ --}}
@@ -214,7 +216,7 @@
             KATEGORI TIKET
         </span>
         <span style="font-size: 14px; color: #a855f7; font-weight: bold; display: block;">
-            TIKET BIASA
+            {{ strtoupper($transaction->ticket->ticket_name ?? 'TIKET REGULER') }}
         </span>
     </div>
 

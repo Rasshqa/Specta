@@ -27,7 +27,7 @@
                         <p class="text-slate-500 text-sm mt-1">Upload foto (WebP) atau video (maks 50MB).</p>
                     </div>
                     <button @click="showAdd = !showAdd" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-purple-900/20 cursor-pointer">
-                        <span x-text="showAdd ? '✕ Batal' : '+ Upload Baru'"></span>
+                        <span x-text="showAdd ? ' Batal' : '+ Upload Baru'"></span>
                     </button>
                 </div>
 
@@ -55,7 +55,7 @@
                                 <div class="relative group">
                                     <input type="file" id="file" name="file" required accept="image/*,video/*" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
                                     <div class="border-2 border-dashed border-slate-700 group-hover:border-purple-500/50 rounded-2xl p-8 text-center transition-all bg-slate-950/50">
-                                        <div class="text-3xl mb-2">📁</div>
+                                        <div class="text-3xl mb-2"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z"/></svg></div>
                                         <p class="text-sm text-slate-400">Klik atau drop file di sini</p>
                                         <p class="text-[10px] text-slate-500 mt-2 uppercase tracking-widest">Image auto-convert ke WebP | Video maks 50MB</p>
                                     </div>
@@ -88,7 +88,7 @@
                                 <div class="w-full aspect-video relative">
                                     <video src="{{ $doc->file_url }}" class="w-full h-full object-cover"></video>
                                     <div class="absolute inset-0 flex items-center justify-center bg-black/40">
-                                        <span class="text-3xl">▶️</span>
+                                        <span class="text-3xl">▶</span>
                                     </div>
                                 </div>
                             @endif
@@ -128,7 +128,7 @@
                     </div>
                     @empty
                     <div class="col-span-full py-20 text-center">
-                        <div class="text-5xl mb-4">📸</div>
+                        <div class="text-5xl mb-4"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3"/></svg></div>
                         <p class="text-slate-400">Belum ada dokumentasi yang diupload.</p>
                     </div>
                     @endforelse

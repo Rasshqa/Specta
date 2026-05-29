@@ -36,7 +36,7 @@
                         <p class="text-slate-500 text-sm mt-1">Kelola riwayat SPECTA per tahun. Centang "Tahun Berjalan" untuk highlight di halaman utama.</p>
                     </div>
                     <button @click="showAdd = !showAdd" class="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg cursor-pointer">
-                        <span x-text="showAdd ? '✕ Batal' : '+ Tambah Timeline'"></span>
+                        <span x-text="showAdd ? ' Batal' : '+ Tambah Timeline'"></span>
                     </button>
                 </div>
 
@@ -62,7 +62,7 @@
                             <img src="{{ $tl->image_url }}" alt="{{ $tl->title }}" class="w-full md:w-48 h-36 object-cover flex-shrink-0">
                             @else
                             <div class="w-full md:w-48 h-36 bg-gradient-to-br from-cyan-950/50 to-slate-900 flex items-center justify-center text-4xl flex-shrink-0">
-                                📅
+                                <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
                             </div>
                             @endif
 
@@ -82,7 +82,7 @@
                                         @if($tl->subtitle)<p class="text-xs text-purple-400 font-semibold">{{ $tl->subtitle }}</p>@endif
                                     </div>
                                     <div class="flex gap-2 flex-shrink-0">
-                                        <button @click="editId = editId === {{ $tl->id }} ? null : {{ $tl->id }}" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer">✏️ Edit</button>
+                                        <button @click="editId = editId === {{ $tl->id }} ? null : {{ $tl->id }}" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83l3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75z"/></svg> Edit</button>
                                         <form action="{{ route('admin.infocenter.timelines.destroy', $tl) }}" method="POST" onsubmit="return confirm('Hapus data timeline ini?')" class="m-0 p-0 flex">
                                             @csrf 
                                             @method('DELETE')
@@ -90,7 +90,7 @@
                                                type="submit" 
                                                class="text-xs bg-red-900/40 hover:bg-red-800/60 text-red-400 px-3 py-1.5 rounded-lg font-bold border border-red-800/40 cursor-pointer"
                                             >
-                                               🗑️
+                                               <svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6z"/></svg>
                                             </button>
                                         </form>
                                     </div>                                </div>
@@ -112,7 +112,7 @@
                     </div>
                     @empty
                     <div class="text-center py-16 text-slate-500">
-                        <p class="text-4xl mb-3">📅</p>
+                        <p class="text-4xl mb-3"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg></p>
                         <p class="font-semibold">Belum ada data timeline.</p>
                     </div>
                     @endforelse
