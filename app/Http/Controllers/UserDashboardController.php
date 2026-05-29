@@ -26,7 +26,7 @@ class UserDashboardController extends Controller
                 'download_token', 
                 'created_at'
             ])
-            ->with(['ticketCodes:id,transaction_id,code,status'])
+            ->with(['ticketCodes:id,transaction_id,unique_ticket_code,is_scanned'])
             ->where('buyer_email', $email)
             ->orWhere('buyer_whatsapp', $email)
             ->orderBy('created_at', 'desc')

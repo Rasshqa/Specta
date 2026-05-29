@@ -2,20 +2,30 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\MootaWebhookController;
+use App\Http\Controllers\Api\ApiAuthController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+use App\Http\Controllers\Api\DashboardApiController;
+use App\Http\Controllers\Api\GatekeeperController;
 
-// Moota Webhook endpoint
-Route::post('/webhooks/moota', [MootaWebhookController::class, 'handle'])
-    ->middleware('moota.webhook')
-    ->name('api.webhooks.moota');
+// Public API Routes
+Route::post('/login', [ApiAuthController::class, 'login']);
+
+// Protected API Routes
+Route::middleware('auth:sanctum')->group(function () {
+    // Return current authenticated user
+    Route::get('/user', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'message' => 'User retrieved successfully',
+            'data'    => $request->user()
+        ]);
+    });
+
+    Route::post('/logout', [ApiAuthController::class, 'logout']);
+
+    // Mobile Dashboard Stats
+    Route::get('/dashboard/stats', [DashboardApiController::class, 'stats']);
+
+    // Gatekeeper Scanner Endpoint
+    Route::post('/gatekeeper/scan', [GatekeeperController::class, 'scan']);
+});
