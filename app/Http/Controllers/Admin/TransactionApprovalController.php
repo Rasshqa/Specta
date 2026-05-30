@@ -21,9 +21,9 @@ class TransactionApprovalController extends Controller
      */
     public function approve(string $invoice)
     {
-        $transaction = Transaction::with('ticket')
-            ->where('invoice_number', $invoice)
-            ->where('status', 'PENDING_PROOF')
+        $transaction = Transaction::query()->with('ticket')
+            ->where('invoice_number', '=', $invoice)
+            ->where('status', '=', 'PENDING_PROOF')
             ->firstOrFail();
 
         DB::transaction(function () use ($transaction) {
@@ -55,7 +55,7 @@ class TransactionApprovalController extends Controller
                 do {
                     $code   = 'TKT-' . strtoupper(Str::random(5)) . '-' . rand(10000, 99999) . '-' . ($i + 1);
                     $exists = in_array($code, array_column($codes, 'unique_ticket_code'))
-                              || TicketCode::where('unique_ticket_code', $code)->exists();
+                              || TicketCode::where('unique_ticket_code', '=', $code)->exists();
                     $attempts++;
                 } while ($exists && $attempts < 5);
 
@@ -88,15 +88,15 @@ class TransactionApprovalController extends Controller
      */
     public function reject(string $invoice)
     {
-        $transaction = Transaction::where('invoice_number', $invoice)
-            ->where('status', 'PENDING_PROOF')
+        $transaction = Transaction::query()->where('invoice_number', '=', $invoice)
+            ->where('status', '=', 'PENDING_PROOF')
             ->firstOrFail();
 
         DB::transaction(function () use ($transaction) {
             // Restore quota back to the ticket using direct DB update (no extra SELECT)
             if ($transaction->ticket_id) {
                 DB::table('tickets')
-                    ->where('id', $transaction->ticket_id)
+                    ->where('id', '=', $transaction->ticket_id)
                     ->increment('remaining_quota', $transaction->quantity);
             }
 
@@ -115,6 +115,7 @@ class TransactionApprovalController extends Controller
         // Invalidate dashboard stats cache
         cache()->forget('admin_dashboard_stats');
         cache()->forget('admin_tickets_list');
+        cache()->forget('admin_tickets_list_api');
 
         Log::info("Transaction rejected: {$invoice} — quota restored.");
 

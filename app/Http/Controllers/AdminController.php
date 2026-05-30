@@ -18,20 +18,20 @@ class AdminController extends Controller
     {
         // One query for all transaction counts/sums instead of 5 separate queries
         $stats = cache()->remember('admin_dashboard_stats', 60, function () {
-            $agg = Transaction::selectRaw("
+            $agg = Transaction::query()->selectRaw("
                 COUNT(*) AS total_transactions,
                 SUM(CASE WHEN status = 'PENDING_PROOF' THEN 1 ELSE 0 END) AS pending_transactions,
                 SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) AS success_transactions,
                 SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END) AS expired_transactions,
                 SUM(CASE WHEN status = 'SUCCESS' THEN total_price ELSE 0 END) AS total_revenue,
                 SUM(CASE WHEN status = 'SUCCESS' THEN quantity ELSE 0 END) AS tickets_sold
-            ")->first();
+            ", [])->first();
 
-            $ticketAgg = TicketCode::selectRaw("
+            $ticketAgg = TicketCode::query()->selectRaw("
                 COUNT(*) AS qr_generated,
                 SUM(CASE WHEN is_scanned = 1 THEN 1 ELSE 0 END) AS qr_scanned,
                 SUM(CASE WHEN is_scanned = 1 AND DATE(scanned_at) = CURDATE() THEN 1 ELSE 0 END) AS scanned_today
-            ")->first();
+            ", [])->first();
 
             return [
                 'total_transactions'   => (int) $agg->total_transactions,
@@ -48,11 +48,11 @@ class AdminController extends Controller
 
         // Cache ticket data (rarely changes)
         $tickets = cache()->remember('admin_tickets_list', 3600, function () {
-            return Ticket::select(['id', 'ticket_name', 'price', 'remaining_quota'])->get();
+            return Ticket::query()->select(['id', 'ticket_name', 'price', 'quota', 'remaining_quota'])->get();
         });
 
         // Select only columns needed by the view, avoid SELECT *
-        $recentOrders = Transaction::select([
+        $recentOrders = Transaction::query()->select([
                 'id', 'invoice_number', 'buyer_name', 'buyer_email',
                 'ticket_id', 'quantity', 'total_price', 'status', 'created_at'
             ])
@@ -69,7 +69,7 @@ class AdminController extends Controller
      */
     public function transactions(Request $request)
     {
-        $query = Transaction::select([
+        $query = Transaction::query()->select([
                 'id', 'invoice_number', 'buyer_name', 'buyer_email', 'buyer_whatsapp',
                 'ticket_id', 'quantity', 'total_price', 'status', 'payment_proof', 'created_at'
             ])
@@ -77,7 +77,7 @@ class AdminController extends Controller
             ->latest();
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('status', '=', $request->status);
         }
 
         if ($request->filled('search')) {
@@ -101,7 +101,7 @@ class AdminController extends Controller
      */
     public function merchandises()
     {
-        $merchandises = Merchandise::latest()->paginate(12);
+        $merchandises = Merchandise::query()->latest()->paginate(12);
 
         return view('admin.merchandises', compact('merchandises'));
     }
@@ -121,7 +121,7 @@ class AdminController extends Controller
         }
         unset($data['stock']); // stock not in table, ignore
 
-        Merchandise::create($data);
+        Merchandise::query()->create($data);
 
         return back()->with('success', 'Merchandise berhasil ditambahkan.');
     }
@@ -162,8 +162,8 @@ class AdminController extends Controller
     {
         $request->validate(['code' => 'required|string']);
 
-        $ticketCode = TicketCode::with(['transaction:id,invoice_number,buyer_name,status'])
-            ->where('unique_ticket_code', $request->code)
+        $ticketCode = TicketCode::query()->with(['transaction:id,invoice_number,buyer_name,status'])
+            ->where('unique_ticket_code', '=', $request->code)
             ->first();
 
         if (!$ticketCode) {
@@ -194,7 +194,7 @@ class AdminController extends Controller
     private function saveWebP($file, string $folder): string
     {
         $ext   = strtolower($file->getClientOriginalExtension());
-        $name  = time() . '_' . uniqid() . '.webp';
+        $name  = time() . '_' . uniqid('') . '.webp';
         $dest  = $folder . '/' . $name;
 
         if ($ext === 'webp') {

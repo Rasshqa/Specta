@@ -24,7 +24,7 @@ class GatekeeperController extends Controller
 
         try {
             $codeStr = $request->input('ticket_code');
-            $ticketCode = TicketCode::with('transaction')->where('unique_ticket_code', $codeStr)->first();
+            $ticketCode = TicketCode::with('transaction')->where('unique_ticket_code', '=', $codeStr)->first();
 
             // 1. Check if code exists
             if (!$ticketCode) {

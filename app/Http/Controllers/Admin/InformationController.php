@@ -13,7 +13,7 @@ class InformationController extends Controller
      */
     public function index()
     {
-        $informations = Information::latest()->paginate(10);
+        $informations = Information::query()->latest()->paginate(10);
         return view('admin.informations.index', compact('informations'));
     }
 
@@ -31,7 +31,7 @@ class InformationController extends Controller
 
         $validated['is_active'] = $request->has('is_active') ? $request->is_active : true;
 
-        Information::create($validated);
+        Information::query()->create($validated);
 
         return redirect()->route('admin.informations.index')
             ->with('success', 'Informasi berhasil ditambahkan!');

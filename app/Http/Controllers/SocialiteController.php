@@ -21,7 +21,10 @@ class SocialiteController extends Controller
      */
     public function redirectToGoogle(): RedirectResponse
     {
-        return Socialite::driver('google')
+        /** @var \Laravel\Socialite\Two\GoogleProvider $driver */
+        $driver = Socialite::driver('google');
+
+        return $driver
             ->with(['prompt' => 'select_account'])
             ->redirect();
     }
@@ -66,7 +69,7 @@ class SocialiteController extends Controller
         }
 
         // Cari user berdasarkan email dari Google
-        $user = User::where('email', $googleUser->getEmail())->first();
+        $user = User::firstWhere('email', $googleUser->getEmail());
 
         if ($user) {
             // ── Skenario A: Email sudah terdaftar di database ─────────────────────

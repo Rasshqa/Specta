@@ -30,7 +30,7 @@ class GatekeeperController extends Controller
 
         // Find the ticket code with eager-loaded transaction and ticket
         $ticketCode = TicketCode::with(['transaction.ticket'])
-            ->where('unique_ticket_code', $code)
+            ->where('unique_ticket_code', '=', $code)
             ->first();
 
         // ── Not found ────────────────────────────────────────────────────────

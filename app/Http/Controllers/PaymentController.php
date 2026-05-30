@@ -12,8 +12,8 @@ class PaymentController extends Controller
      */
     public function show(string $invoice)
     {
-        $transaction = Transaction::with('ticket')
-            ->where('invoice_number', $invoice)
+        $transaction = Transaction::query()->with('ticket')
+            ->where('invoice_number', '=', $invoice)
             ->firstOrFail();
 
         return view('payment.show', compact('transaction'));
@@ -24,7 +24,7 @@ class PaymentController extends Controller
      */
     public function status(string $invoice)
     {
-        $transaction = Transaction::where('invoice_number', $invoice)
+        $transaction = Transaction::query()->where('invoice_number', '=', $invoice)
             ->select(['invoice_number', 'status', 'updated_at'])
             ->firstOrFail();
 

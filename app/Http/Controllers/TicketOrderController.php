@@ -26,7 +26,7 @@ class TicketOrderController extends Controller
     {
         // Cache available tickets — rarely change, expensive to re-query
         $tickets = cache()->remember('tickets_available', 300, function () {
-            return Ticket::select(['id', 'ticket_name', 'price', 'remaining_quota'])
+            return Ticket::query()->select(['id', 'ticket_name', 'price', 'remaining_quota'])
                 ->where('remaining_quota', '>', 0)
                 ->get();
         });
@@ -53,9 +53,9 @@ class TicketOrderController extends Controller
         try {
             $transaction = DB::transaction(function () use ($validated): Transaction {
                 /** @var Ticket $ticket */
-                $ticket = Ticket::where('ticket_name', 'Tiket Reguler')->lockForUpdate()->first();
+                $ticket = Ticket::query()->where('ticket_name', '=', 'Tiket Reguler')->lockForUpdate()->first();
                 if (!$ticket) {
-                    $ticket = Ticket::lockForUpdate()->first();
+                    $ticket = Ticket::query()->lockForUpdate()->first();
                 }
 
                 if (!$ticket) {
@@ -78,7 +78,7 @@ class TicketOrderController extends Controller
 
                 $ticket->decrement('remaining_quota', $validated['quantity']);
 
-                return Transaction::create([
+                return Transaction::query()->create([
                     'ticket_id'      => $ticket->id,
                     'invoice_number' => $invoiceNumber,
                     'buyer_name'     => $validated['buyer_name'],
@@ -92,14 +92,15 @@ class TicketOrderController extends Controller
                 ]);
             });
 
-            return redirect()
-                ->route('payment.show', ['invoice' => $transaction->invoice_number])
-                ->with('success', 'Pesanan berhasil dibuat! Silakan unggah bukti pembayaran Anda.');
-
             // Invalidate caches that depend on quota/stats
             cache()->forget('tickets_available');
             cache()->forget('admin_dashboard_stats');
             cache()->forget('admin_tickets_list');
+            cache()->forget('admin_tickets_list_api');
+
+            return redirect()
+                ->route('payment.show', ['invoice' => $transaction->invoice_number])
+                ->with('success', 'Pesanan berhasil dibuat! Silakan unggah bukti pembayaran Anda.');
 
         } catch (\RuntimeException $e) {
             return back()->withInput()->withErrors(['quantity' => $e->getMessage()]);
@@ -123,8 +124,8 @@ class TicketOrderController extends Controller
             'payment_proof.max'      => 'Ukuran file maksimal 10MB.',
         ]);
 
-        $transaction = Transaction::where('invoice_number', $invoice)
-            ->where('status', 'PENDING_PROOF')
+        $transaction = Transaction::query()->where('invoice_number', '=', $invoice)
+            ->where('status', '=', 'PENDING_PROOF')
             ->firstOrFail();
 
         try {
@@ -235,7 +236,7 @@ class TicketOrderController extends Controller
      */
     public function downloadTicket(string $token)
     {
-        $transaction = Transaction::select([
+        $transaction = Transaction::query()->select([
                 'id', 'invoice_number', 'ticket_id', 'buyer_name', 'buyer_email',
                 'buyer_whatsapp', 'quantity', 'total_price', 'status', 'download_token', 'created_at'
             ])
@@ -243,8 +244,8 @@ class TicketOrderController extends Controller
                 'ticket:id,ticket_name,price',
                 'ticketCodes:id,transaction_id,unique_ticket_code,is_scanned'
             ])
-            ->where('download_token', $token)
-            ->where('status', 'SUCCESS')
+            ->where('download_token', '=', $token)
+            ->where('status', '=', 'SUCCESS')
             ->firstOrFail();
 
         $pdf = Pdf::loadView('tickets.pdf', compact('transaction'))
@@ -265,7 +266,7 @@ class TicketOrderController extends Controller
         do {
             $suffix  = strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 6));
             $invoice = $prefix . $suffix;
-            $exists  = Transaction::where('invoice_number', $invoice)->exists();
+            $exists  = Transaction::query()->where('invoice_number', '=', $invoice)->exists();
             $attempts++;
         } while ($exists && $attempts < 10);
 

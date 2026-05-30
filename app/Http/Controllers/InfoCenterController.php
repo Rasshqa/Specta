@@ -15,7 +15,7 @@ class InfoCenterController extends Controller
     public function eskulIndex()
     {
         $eskuls = cache()->remember('admin_eskul_profiles', 86400, function () {
-            return EskulProfile::select(['id', 'name', 'icon', 'description', 'detail', 'schedule', 'contact', 'activities', 'achievements', 'is_active', 'sort_order', 'image_path'])
+            return EskulProfile::query()->select(['id', 'name', 'icon', 'description', 'detail', 'schedule', 'contact', 'activities', 'achievements', 'is_active', 'sort_order', 'image_path'])
                 ->orderBy('sort_order')
                 ->get();
         });
@@ -45,7 +45,7 @@ class InfoCenterController extends Controller
         $data['sort_order'] = $request->input('sort_order', 0);
         unset($data['image']);
 
-        EskulProfile::create($data);
+        EskulProfile::query()->create($data);
         cache()->forget('admin_eskul_profiles');
         return back()->with('success', 'Eskul berhasil ditambahkan.');
     }
@@ -92,7 +92,7 @@ class InfoCenterController extends Controller
     public function winnersIndex()
     {
         $winners = cache()->remember('admin_winners_list', 86400, function () {
-            return Winner::select(['id', 'rank', 'name', 'school', 'category', 'score', 'is_active', 'sort_order', 'image_path'])
+            return Winner::query()->select(['id', 'rank', 'name', 'school', 'category', 'score', 'is_active', 'sort_order', 'image_path'])
                 ->orderBy('sort_order')
                 ->get();
         });
@@ -119,7 +119,7 @@ class InfoCenterController extends Controller
         $data['sort_order'] = $request->input('sort_order', 0);
         unset($data['image']);
 
-        Winner::create($data);
+        Winner::query()->create($data);
         cache()->forget('admin_winners_list');
         return back()->with('success', 'Pemenang berhasil ditambahkan.');
     }
@@ -163,7 +163,7 @@ class InfoCenterController extends Controller
     public function docsIndex()
     {
         $docs = cache()->remember('admin_docs_list', 3600, function () {
-            return \App\Models\Documentation::select(['id', 'title', 'description', 'event_date', 'file_path', 'file_type', 'is_active', 'created_at'])
+            return \App\Models\Documentation::query()->select(['id', 'title', 'description', 'event_date', 'file_path', 'file_type', 'is_active', 'created_at'])
                 ->latest()
                 ->get();
         });
@@ -189,7 +189,7 @@ class InfoCenterController extends Controller
         }
 
         $type     = $isVideo ? 'video' : 'image';
-        $fileName = time() . '_' . uniqid();
+        $fileName = time() . '_' . uniqid('');
         $path     = '';
 
         if ($type === 'image') {
@@ -219,7 +219,7 @@ class InfoCenterController extends Controller
             }
         }
 
-        \App\Models\Documentation::create([
+        \App\Models\Documentation::query()->create([
             'title'       => $request->title,
             'description' => $request->description,
             'event_date'  => $eventDate,

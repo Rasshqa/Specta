@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiAuthController;
 
 use App\Http\Controllers\Api\DashboardApiController;
 use App\Http\Controllers\Api\GatekeeperController;
+use App\Http\Controllers\Api\AdminTransactionApiController;
 
 // Public API Routes
 Route::post('/login', [ApiAuthController::class, 'login']);
@@ -28,4 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Gatekeeper Scanner Endpoint
     Route::post('/gatekeeper/scan', [GatekeeperController::class, 'scan']);
+
+    // Admin transaction management (mobile)
+    Route::get('/admin/transactions/pending', [AdminTransactionApiController::class, 'pending']);
+    Route::post('/admin/transaction/{invoice}/approve', [AdminTransactionApiController::class, 'approve']);
+    Route::post('/admin/transaction/{invoice}/reject', [AdminTransactionApiController::class, 'reject']);
+    Route::post('/admin/transaction/manual', [AdminTransactionApiController::class, 'storeManual']);
 });

@@ -29,7 +29,7 @@
         .float { animation: float 6s ease-in-out infinite; }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen grid-bg flex items-center justify-center px-4 py-12 relative overflow-hidden">
+<body class="text-slate-100 min-h-screen grid-bg flex items-center justify-center px-4 py-12 relative overflow-x-hidden">
 
     {{-- Ambient Universe Glows --}}
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">

@@ -27,8 +27,8 @@ class UserDashboardController extends Controller
                 'created_at'
             ])
             ->with(['ticketCodes:id,transaction_id,unique_ticket_code,is_scanned'])
-            ->where('buyer_email', $email)
-            ->orWhere('buyer_whatsapp', $email)
+            ->where('buyer_email', '=', $email)
+            ->orWhere('buyer_whatsapp', '=', $email)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
