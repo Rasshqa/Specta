@@ -17,7 +17,13 @@ Route::get('/images/proofs/{filename}', function ($filename) {
     if (!file_exists($path)) {
         return response()->json(['error' => 'Image not found'], 404);
     }
-    return response()->file($path);
+    
+    $mime = 'image/jpeg';
+    if (str_ends_with(strtolower($filename), '.png')) $mime = 'image/png';
+    if (str_ends_with(strtolower($filename), '.jpg')) $mime = 'image/jpeg';
+    if (str_ends_with(strtolower($filename), '.jfif')) $mime = 'image/jpeg';
+    
+    return response()->file($path, ['Content-Type' => $mime]);
 });
 
 // Protected API Routes
