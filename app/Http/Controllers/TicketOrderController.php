@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use App\Models\Transaction;
+use App\Services\OneSignalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -154,6 +155,12 @@ class TicketOrderController extends Controller
             }
 
             $transaction->update(['payment_proof' => $filename]);
+
+            // Notify admins via OneSignal
+            OneSignalService::sendNewPaymentNotification(
+                'Pembayaran Baru Masuk',
+                "Pesanan {$invoice} dari {$transaction->buyer_name} sudah upload bukti bayar. Segera verifikasi!"
+            );
 
             return redirect()
                 ->route('payment.show', $invoice)
