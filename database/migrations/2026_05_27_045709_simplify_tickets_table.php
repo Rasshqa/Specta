@@ -17,9 +17,9 @@ return new class extends Migration
         DB::table('tickets')->truncate();
         Schema::enableForeignKeyConstraints();
 
-        // Insert a SINGLE new row for "Tiket Biasa" with combined quota and new price (110000)
+        // Insert a SINGLE new row for "Tiket Reguler" with combined quota and new price (110000)
         DB::table('tickets')->insert([
-            'ticket_name'     => 'Tiket Biasa',
+            'ticket_name'     => 'Tiket Reguler',
             'price'           => 110000,
             'quota'           => 600, // combined quota e.g., 500 + 100
             'remaining_quota' => 600,
