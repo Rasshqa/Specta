@@ -11,6 +11,15 @@ use App\Http\Controllers\Api\AdminTransactionApiController;
 // Public API Routes
 Route::post('/login', [ApiAuthController::class, 'login']);
 
+// Serve images via API to ensure CORS headers are attached (useful for local Flutter web dev)
+Route::get('/images/proofs/{filename}', function ($filename) {
+    $path = storage_path('app/public/proofs/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response()->file($path);
+});
+
 // Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
     // Return current authenticated user

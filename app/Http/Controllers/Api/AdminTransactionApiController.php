@@ -184,7 +184,7 @@ class AdminTransactionApiController extends Controller
             'ticket_quantity'   => $tx->quantity,
             'status'            => $tx->status,
             'payment_proof_url' => $tx->payment_proof
-                ? asset('storage/proofs/' . $tx->payment_proof)
+                ? url('api/images/proofs/' . $tx->payment_proof)
                 : null,
             'created_at'        => $tx->created_at?->toIso8601String(),
         ];
