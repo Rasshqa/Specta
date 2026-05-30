@@ -17,7 +17,7 @@ class TicketOrderController extends Controller
     /**
      * The rigid ticket price — enforced globally. No bypass allowed.
      */
-    private const TICKET_PRICE = 100000;
+    private const TICKET_PRICE = 110000;
 
     /**
      * Display the ticket/buy landing page.
@@ -71,7 +71,7 @@ class TicketOrderController extends Controller
 
                 $invoiceNumber = $this->generateInvoiceNumber();
 
-                // Rigid price — IDR 100,000 per ticket, no exceptions
+                // Rigid price — IDR 110,000 per ticket, no exceptions
                 $unitPrice  = self::TICKET_PRICE;
                 $basePrice  = $unitPrice * $validated['quantity'];
                 $totalPrice = $basePrice;

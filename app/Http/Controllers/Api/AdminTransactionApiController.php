@@ -18,7 +18,7 @@ class AdminTransactionApiController extends Controller
 {
     use ApiResponser;
 
-    private const TICKET_PRICE = 100000;
+    private const TICKET_PRICE = 110000;
 
     /**
      * List all transactions awaiting payment proof review.
