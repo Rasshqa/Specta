@@ -46,7 +46,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
             @foreach($merchandises as $merch)
             @php
-                $waNumber = '6281234567890';
+                $waNumber = '6287780250072';
                 $waText = urlencode("Halo Admin SPECTA XXI! Saya tertarik untuk membeli merchandise berikut:\n\n*{$merch->name}*\nHarga: Rp " . number_format($merch->price, 0, ',', '.') . "\n\nApakah masih tersedia?");
             @endphp
             <button 
