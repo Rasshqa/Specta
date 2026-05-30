@@ -15,7 +15,7 @@ Route::post('/login', [ApiAuthController::class, 'login']);
 Route::get('/images/proofs/{filename}', function ($filename) {
     $path = storage_path('app/public/proofs/' . $filename);
     if (!file_exists($path)) {
-        abort(404);
+        return response()->json(['error' => 'Image not found'], 404);
     }
     return response()->file($path);
 });
