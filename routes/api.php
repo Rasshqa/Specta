@@ -13,7 +13,9 @@ Route::middleware(['throttle:60,1'])->post('/login', [ApiAuthController::class, 
 
 // Serve images via API to ensure CORS headers are attached (useful for local Flutter web dev)
 Route::get('/images/proofs/{filename}', function ($filename) {
-    $path = storage_path('app/public/proofs/' . $filename);
+    // SECURITY: Prevent Directory Traversal (LFI) by using basename
+    $safeFilename = basename($filename);
+    $path = storage_path('app/public/proofs/' . $safeFilename);
     if (!file_exists($path)) {
         return response()->json(['error' => 'Image not found'], 404);
     }
