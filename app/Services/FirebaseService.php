@@ -48,13 +48,19 @@ class FirebaseService
                             'title' => $title,
                             'body'  => $body,
                         ],
+                        'data' => [
+                            'title' => $title,
+                            'body'  => $body,
+                            'type'  => 'payment_alert',
+                        ],
                         'android' => [
                             'priority' => 'high',
                             'notification' => [
-                                'channel_id'      => 'transaction_alerts_channel',
-                                'notification_priority' => 'PRIORITY_MAX',
-                                'default_sound'   => true,
-                                'default_vibrate_timings' => true,
+                                'channel_id'             => 'transaction_alerts_channel',
+                                'notification_priority'  => 'PRIORITY_MAX',
+                                'default_sound'          => true,
+                                'default_vibrate_timings'=> true,
+                                'visibility'             => 'PUBLIC',
                             ],
                         ],
                     ],
