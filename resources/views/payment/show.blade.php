@@ -180,19 +180,13 @@
                     </div>
                 </div>
 
-                    {{-- Proof Upload Form --}}
+                    {{-- Proof Upload Form / Waiting Status --}}
+                    @if(!$transaction->payment_proof)
+                    {{-- Form only shown when no proof has been uploaded yet --}}
                     <div class="bg-slate-800/40 border border-purple-500/20 rounded-2xl p-5 mb-6">
                         <p class="text-sm text-slate-300 font-semibold mb-1"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3"/></svg> Upload Bukti Pembayaran</p>
                         <p class="text-xs text-slate-500 mb-4">
                             Setelah transfer/scan QRIS, upload screenshot atau foto bukti pembayaran Anda di sini.
-                            @if($transaction->payment_proof)
-                                <div class="mt-2 flex items-center gap-2">
-                                    <span class="text-green-400 text-xs"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M21 7L9 19l-5.5-5.5l1.41-1.41L9 16.17L19.59 5.59z"/></svg> Sudah diunggah — tim kami sedang memverifikasi.</span>
-                                    <a href="{{ asset('storage/proofs/' . $transaction->payment_proof) }}" target="_blank" class="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 ml-2 underline text-xs font-semibold">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> Lihat Bukti
-                                    </a>
-                                </div>
-                            @endif
                         </p>
 
                         <form action="{{ route('payment.proof.upload', $transaction->invoice_number) }}"
@@ -253,6 +247,43 @@
                             </button>
                         </form>
                     </div>
+
+                    @else
+                    {{-- Proof already uploaded — show waiting panel --}}
+                    <div class="bg-slate-800/40 border border-green-500/30 rounded-2xl p-6 mb-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-green-400 font-bold text-sm mb-1">Bukti Pembayaran Sudah Dikirim!</p>
+                                <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                                    Tim kami sedang memverifikasi bukti pembayaran Anda. E-Tiket akan otomatis tersedia di halaman ini setelah dikonfirmasi (maks. 1×24 jam).
+                                </p>
+                                <a href="{{ asset('storage/proofs/' . $transaction->payment_proof) }}"
+                                   target="_blank"
+                                   class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-xs font-semibold border border-purple-500/30 hover:border-purple-400/50 rounded-lg px-3 py-1.5 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    Lihat Bukti yang Dikirim
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- Animated waiting indicator --}}
+                        <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center gap-2">
+                            <span class="flex h-2 w-2 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
+                            </span>
+                            <p class="text-xs text-slate-500">Menunggu konfirmasi admin…</p>
+                        </div>
+                    </div>
+                    @endif
 
                     {{-- Instructions --}}
                     <div class="bg-slate-800/40 border border-slate-700/30 rounded-2xl p-5">
