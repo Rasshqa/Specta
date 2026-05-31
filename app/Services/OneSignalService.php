@@ -29,7 +29,9 @@ class OneSignalService
         }
 
         // Detect token type: OAuth tokens start with 'os_v2_app_'
-        $authHeader = 'Basic ' . $restApiKey;
+        $authHeader = str_starts_with($restApiKey, 'os_v2_app_') 
+            ? 'Bearer ' . $restApiKey 
+            : 'Basic ' . $restApiKey;
 
         try {
             $response = Http::withHeaders([
@@ -41,7 +43,7 @@ class OneSignalService
                 'included_segments' => ['All'],     // 'All' targets every subscriber
                 'headings'          => ['en' => $title],
                 'contents'          => ['en' => $message],
-                'android_channel_id' => 'transaction_alerts_channel', // matches Flutter channel
+                'existing_android_channel_id' => 'transaction_alerts_channel', // matches Flutter channel
                 'priority'          => 10,          // max priority for heads-up display
             ]);
 
