@@ -21,18 +21,19 @@ class TransactionApprovalController extends Controller
      */
     public function approve(string $invoice)
     {
-        $transaction = Transaction::query()->with('ticket')
-            ->where('invoice_number', '=', $invoice)
-            ->where('status', '=', 'PENDING_PROOF')
-            ->firstOrFail();
+        $transaction = DB::transaction(function () use ($invoice) {
+            $tx = Transaction::query()->with('ticket')
+                ->where('invoice_number', '=', $invoice)
+                ->where('status', '=', 'PENDING_PROOF')
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        DB::transaction(function () use ($transaction) {
             // 1. Mark as SUCCESS
-            $transaction->update(['status' => 'SUCCESS']);
+            $tx->update(['status' => 'SUCCESS']);
 
             // 2. Auto-delete the physical proof file
-            if ($transaction->payment_proof) {
-                $proofPath = 'proofs/' . $transaction->payment_proof;
+            if ($tx->payment_proof) {
+                $proofPath = 'proofs/' . $tx->payment_proof;
 
                 if (Storage::disk('public')->exists($proofPath)) {
                     Storage::disk('public')->delete($proofPath);
@@ -43,13 +44,13 @@ class TransactionApprovalController extends Controller
                     }
                 }
 
-                $transaction->update(['payment_proof' => null]);
+                $tx->update(['payment_proof' => null]);
             }
 
             // 3. Generate all codes first, then batch insert (avoids N+1 per-seat query)
             $codes = [];
             $now   = now();
-            for ($i = 0; $i < $transaction->quantity; $i++) {
+            for ($i = 0; $i < $tx->quantity; $i++) {
                 // Generate a candidate code and retry on rare collision
                 $attempts = 0;
                 do {
@@ -60,7 +61,7 @@ class TransactionApprovalController extends Controller
                 } while ($exists && $attempts < 5);
 
                 $codes[] = [
-                    'transaction_id'     => $transaction->id,
+                    'transaction_id'     => $tx->id,
                     'unique_ticket_code' => $code,
                     'is_scanned'         => false,
                     'scanned_at'         => null,
@@ -71,10 +72,32 @@ class TransactionApprovalController extends Controller
 
             // Single INSERT for all ticket codes instead of one INSERT per seat
             TicketCode::insert($codes);
+
+            return $tx;
         });
 
         // Invalidate dashboard stats cache so numbers update immediately
         cache()->forget('admin_dashboard_stats');
+
+        // Send Email Notification to Buyer via Queue
+        $downloadToken = $transaction->download_token;
+        $buyerEmail = $transaction->buyer_email;
+        $invoiceNumber = $transaction->invoice_number;
+
+        dispatch(function () use ($invoice, $downloadToken, $buyerEmail, $invoiceNumber) {
+            try {
+                \Illuminate\Support\Facades\Mail::raw(
+                    "Pembayaran Anda untuk Invoice {$invoice} telah kami setujui.\nSilakan download E-Ticket Anda pada link berikut:\n" . route('ticket.download', $downloadToken) . "\n\nTerima Kasih,\nTim SPECTA",
+                    function ($message) use ($buyerEmail, $invoiceNumber) {
+                        $message->to($buyerEmail)
+                                ->subject("E-Ticket SPECTA - {$invoiceNumber}");
+                    }
+                );
+                Log::info("Email notifikasi berhasil dikirim ke {$buyerEmail}");
+            } catch (\Exception $e) {
+                Log::error("Gagal mengirim email notifikasi ke {$buyerEmail}: " . $e->getMessage());
+            }
+        });
 
         Log::info("Transaction approved: {$invoice} — {$transaction->quantity} ticket(s) generated.");
 
@@ -88,28 +111,31 @@ class TransactionApprovalController extends Controller
      */
     public function reject(string $invoice)
     {
-        $transaction = Transaction::query()->where('invoice_number', '=', $invoice)
-            ->where('status', '=', 'PENDING_PROOF')
-            ->firstOrFail();
+        $transaction = DB::transaction(function () use ($invoice) {
+            $tx = Transaction::query()->where('invoice_number', '=', $invoice)
+                ->where('status', '=', 'PENDING_PROOF')
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        DB::transaction(function () use ($transaction) {
             // Restore quota back to the ticket using direct DB update (no extra SELECT)
-            if ($transaction->ticket_id) {
+            if ($tx->ticket_id) {
                 DB::table('tickets')
-                    ->where('id', '=', $transaction->ticket_id)
-                    ->increment('remaining_quota', $transaction->quantity);
+                    ->where('id', '=', $tx->ticket_id)
+                    ->increment('remaining_quota', $tx->quantity);
             }
 
             // Delete proof file if exists (cleanup even on rejection)
-            if ($transaction->payment_proof) {
-                $proofPath = 'proofs/' . $transaction->payment_proof;
+            if ($tx->payment_proof) {
+                $proofPath = 'proofs/' . $tx->payment_proof;
                 if (Storage::disk('public')->exists($proofPath)) {
                     Storage::disk('public')->delete($proofPath);
                 }
-                $transaction->update(['payment_proof' => null]);
+                $tx->update(['payment_proof' => null]);
             }
 
-            $transaction->update(['status' => 'REJECTED']);
+            $tx->update(['status' => 'REJECTED']);
+
+            return $tx;
         });
 
         // Invalidate dashboard stats cache
