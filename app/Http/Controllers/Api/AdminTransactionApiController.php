@@ -161,6 +161,25 @@ class AdminTransactionApiController extends Controller
             cache()->forget('admin_tickets_list');
             cache()->forget('admin_tickets_list_api');
 
+            $downloadToken = $transaction->download_token;
+            $buyerEmail = $transaction->buyer_email;
+            $invoiceNumber = $transaction->invoice_number;
+
+            dispatch(function () use ($invoice, $downloadToken, $buyerEmail, $invoiceNumber) {
+                try {
+                    \Illuminate\Support\Facades\Mail::raw(
+                        "Pembelian Tiket Manual (Invoice {$invoice}) telah berhasil.\nSilakan download E-Ticket Anda pada link berikut:\n" . route('ticket.download', $downloadToken) . "\n\nTerima Kasih,\nTim SPECTA",
+                        function ($message) use ($buyerEmail, $invoiceNumber) {
+                            $message->to($buyerEmail)
+                                    ->subject("E-Ticket SPECTA - {$invoiceNumber}");
+                        }
+                    );
+                    Log::info("Email notifikasi tiket manual berhasil dikirim ke {$buyerEmail}");
+                } catch (\Exception $e) {
+                    Log::error("Gagal mengirim email notifikasi tiket manual ke {$buyerEmail}: " . $e->getMessage());
+                }
+            });
+
             return $this->successResponse(
                 $this->formatTransaction($transaction),
                 'Manual ticket created and approved successfully',

@@ -29,9 +29,7 @@ class OneSignalService
         }
 
         // Detect token type: OAuth tokens start with 'os_v2_app_'
-        $authHeader = str_starts_with($restApiKey, 'os_v2_')
-            ? 'Key ' . $restApiKey      // OAuth format (newer OneSignal)
-            : 'Basic ' . $restApiKey;   // Legacy REST API key
+        $authHeader = 'Basic ' . $restApiKey;
 
         try {
             $response = Http::withHeaders([

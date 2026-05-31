@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\GatekeeperController;
 use App\Http\Controllers\Api\AdminTransactionApiController;
 
 // Public API Routes
-Route::post('/login', [ApiAuthController::class, 'login']);
+Route::middleware(['throttle:60,1'])->post('/login', [ApiAuthController::class, 'login']);
 
 // Serve images via API to ensure CORS headers are attached (useful for local Flutter web dev)
 Route::get('/images/proofs/{filename}', function ($filename) {
@@ -27,7 +27,7 @@ Route::get('/images/proofs/{filename}', function ($filename) {
 });
 
 // Protected API Routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'admin', 'throttle:60,1'])->group(function () {
     // Return current authenticated user
     Route::get('/user', function (Request $request) {
         return response()->json([
