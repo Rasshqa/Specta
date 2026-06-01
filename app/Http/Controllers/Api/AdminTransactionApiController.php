@@ -164,14 +164,26 @@ class AdminTransactionApiController extends Controller
             $downloadToken = $transaction->download_token;
             $buyerEmail = $transaction->buyer_email;
             $invoiceNumber = $transaction->invoice_number;
+            $buyerName = $transaction->buyer_name;
+            $quantity = $transaction->quantity;
+            $totalPrice = $transaction->total_price;
+            $ticketName = $transaction->ticket ? $transaction->ticket->ticket_name : 'Tiket Reguler';
 
-            dispatch(function () use ($invoice, $downloadToken, $buyerEmail, $invoiceNumber) {
+            dispatch(function () use ($downloadToken, $buyerEmail, $invoiceNumber, $buyerName, $quantity, $totalPrice, $ticketName) {
                 try {
-                    \Illuminate\Support\Facades\Mail::raw(
-                        "Pembelian Tiket Manual (Invoice {$invoice}) telah berhasil.\nSilakan download E-Ticket Anda pada link berikut:\n" . route('ticket.download', $downloadToken) . "\n\nTerima Kasih,\nTim SPECTA",
+                    \Illuminate\Support\Facades\Mail::send(
+                        'emails.ticket-approved',
+                        [
+                            'buyer_name'     => $buyerName,
+                            'invoice_number' => $invoiceNumber,
+                            'ticket_name'    => $ticketName,
+                            'quantity'       => $quantity,
+                            'total_price'    => $totalPrice,
+                            'download_url'   => route('ticket.download', $downloadToken),
+                        ],
                         function ($message) use ($buyerEmail, $invoiceNumber) {
                             $message->to($buyerEmail)
-                                    ->subject("E-Ticket SPECTA - {$invoiceNumber}");
+                                    ->subject("E-Tiket SPECTA XXI: REVELIORA - {$invoiceNumber}");
                         }
                     );
                     Log::info("Email notifikasi tiket manual berhasil dikirim ke {$buyerEmail}");

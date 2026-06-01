@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use App\Models\Transaction;
-use App\Services\OneSignalService;
+use App\Services\FirebaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -156,11 +156,13 @@ class TicketOrderController extends Controller
 
             $transaction->update(['payment_proof' => $filename]);
 
-            // Notify admins via OneSignal
-            OneSignalService::sendNewPaymentNotification(
-                'Pembayaran Baru Masuk',
+            Log::info('[DEBUG] Reached FCM call in uploadProof for invoice: ' . $invoice);
+            // Notify admins via FCM
+            FirebaseService::sendNewPaymentNotification(
+                'Pembayaran Baru Masuk! 🎫',
                 "Pesanan {$invoice} dari {$transaction->buyer_name} sudah upload bukti bayar. Segera verifikasi!"
             );
+            Log::info('[DEBUG] FCM call completed in uploadProof');
 
             return redirect()
                 ->route('payment.show', $invoice)

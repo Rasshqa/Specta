@@ -50,4 +50,17 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Firebase Cloud Messaging (FCM HTTP v1)
+    |--------------------------------------------------------------------------
+    | FIREBASE_PROJECT_ID   — found in Firebase Console > Project Settings > General
+    | FIREBASE_CREDENTIALS  — absolute server path to the Service Account JSON file
+    |--------------------------------------------------------------------------
+    */
+    'firebase' => [
+        'project_id'  => env('FIREBASE_PROJECT_ID'),
+        'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase/service-account.json')),
+    ],
+
 ];
