@@ -47,19 +47,20 @@ class AuthController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user = User::create([
+        $user = User::query()->create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => 'user', // Default is normal buyer
+            'role'     => 'user',
         ]);
 
         Auth::login($user);
+        $request->session()->regenerate();
 
-        return redirect()->route('home')->with('success', 'Akun berhasil dibuat.');
+        return redirect()->intended(route('home'))->with('success', 'Akun berhasil dibuat!');
     }
 
     /**
@@ -75,6 +76,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            /** @var \App\Models\User $user */
             $user = Auth::user();
 
             if ($user->isAdmin()) {
@@ -83,7 +85,6 @@ class AuthController extends Controller
                 return redirect()->intended(route('gatekeeper.index'));
             }
 
-            // Normal buyer redirects to home or intended url
             return redirect()->intended(route('home'));
         }
 

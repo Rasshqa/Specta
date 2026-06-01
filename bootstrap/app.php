@@ -6,21 +6,31 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
+        web:      __DIR__.'/../routes/web.php',
+        api:      __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
-        health: '/up',
+        health:   '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+<<<<<<< HEAD
         $middleware->trustProxies(at: '*');
         
         $middleware->alias([
             'moota.webhook' => \App\Http\Middleware\VerifyMootaWebhookSignature::class,
             'admin'         => \App\Http\Middleware\AdminMiddleware::class,
         ]);
+=======
+<<<<<<< HEAD
+        // Global XSS sanitizer — strips dangerous HTML from all text inputs
+        $middleware->append(\App\Http\Middleware\SanitizeInputs::class);
+
+=======
+        $middleware->trustProxies(at: '*');
+>>>>>>> temp-branch
         
-        $middleware->validateCsrfTokens(except: [
-            'api/webhooks/moota', // Just in case, although API routes exclude CSRF by default
+>>>>>>> 7daff97 (fix: trust proxies to prevent infinite redirect and 419 errors)
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

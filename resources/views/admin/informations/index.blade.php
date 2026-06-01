@@ -26,7 +26,7 @@
                 <h1 class="font-bold text-slate-200">Kelola Pusat Informasi</h1>
             </div>
             <button @click.stop="showAdd = true" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-purple-600/20 transition-all flex items-center gap-2 cursor-pointer">
-                <span>➕</span> Tambah Pengumuman
+                <span><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg></span> Tambah Pengumuman
             </button>
         </header>
 
@@ -163,7 +163,7 @@
                 </div>
                 @empty
                 <div class="col-span-full py-20 text-center bg-slate-900/40 rounded-3xl border border-slate-800/60 border-dashed">
-                    <div class="text-5xl mb-4">📢</div>
+                    <div class="text-5xl mb-4"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1v4a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4h3l5 4V4zm9.5 4c0 1.71-.96 3.26-2.5 4V8c1.53.75 2.5 2.3 2.5 4"/></svg></div>
                     <p class="text-slate-400 text-lg font-semibold">Belum ada pengumuman.</p>
                     <p class="text-sm text-slate-500 mt-2">Buat pengumuman baru untuk ditampilkan di landing page Velorans.</p>
                 </div>

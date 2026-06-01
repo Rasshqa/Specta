@@ -16,9 +16,9 @@
     <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
         @php
             $navItems = [
-                ['icon'=>'🏠','label'=>'Dashboard','route'=>'admin.dashboard'],
-                ['icon'=>'📋','label'=>'Transaksi','route'=>'admin.transactions'],
-                ['icon'=>'🛍️','label'=>'Merchandise','route'=>'admin.merchandises'],
+                ['icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8z"/></svg>','label'=>'Dashboard','route'=>'admin.dashboard'],
+                ['icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7 8h2v4H8V9H7zm3 9v1H7v-.92L9 15H7v-1h2.25c.41 0 .75.34.75.75c0 .2-.08.39-.21.52L8.12 17zm1-13c0-.55.45-1 1-1s1 .45 1 1s-.45 1-1 1s-1-.45-1-1m6 13h-5v-2h5zm0-6h-5V9h5z"/></svg>','label'=>'Transaksi','route'=>'admin.transactions'],
+                ['icon'=>'<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2m-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3m7 17H5V8h14zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3"/></svg>','label'=>'Merchandise','route'=>'admin.merchandises'],
             ];
         @endphp
         @foreach($navItems as $item)
@@ -30,7 +30,7 @@
                     ? 'bg-purple-600/30 text-purple-200 border border-purple-500/30'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60' }}"
         >
-            <span class="text-base">{{ $item['icon'] }}</span>
+            <span class="text-base">{!! $item['icon'] !!}</span>
             {{ $item['label'] }}
         </a>
         @endforeach
@@ -56,7 +56,7 @@
                     ? 'bg-cyan-600/20 text-cyan-200 border border-cyan-500/20'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60' }}"
         >
-            <span class="text-base">{{ $item['icon'] }}</span>
+            <span class="text-base">{!! $item['icon'] !!}</span>
             {{ $item['label'] }}
         </a>
         @endforeach
@@ -64,22 +64,17 @@
 
     {{-- Footer --}}
     <div class="flex-shrink-0 px-6 py-5 border-t border-slate-800/60 space-y-3">
-        <a
-            href="/"
-            target="_blank"
-            class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-gradient-to-r from-purple-900/40 to-cyan-900/40 hover:from-purple-800/50 hover:to-cyan-800/50 text-slate-200 hover:text-white rounded-xl text-xs uppercase tracking-wider font-bold border border-purple-500/20 hover:border-purple-500/40 transition-all duration-200 shadow-md text-center"
-        >
-            <span>🌐</span> Halaman Utama
+        <a href="{{ url('/') }}" class="w-full flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+            <span>🌐</span> Kembali ke Web
         </a>
-
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button
                 id="btn-logout"
                 type="submit"
-                class="w-full flex items-center justify-center gap-2 py-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
+                class="w-full flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
             >
-                <span>🚪</span> Keluar
+                <span><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5M4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4z"/></svg></span> Keluar
             </button>
         </form>
     </div>

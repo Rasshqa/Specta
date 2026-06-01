@@ -9,7 +9,7 @@ class MerchController extends Controller
 {
     public function index()
     {
-        $merchandises = Merchandise::latest()->get();
+        $merchandises = Merchandise::query()->latest()->get();
         return view('merch.index', compact('merchandises'));
     }
 }

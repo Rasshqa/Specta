@@ -46,15 +46,15 @@
                     <label class="block text-xs text-slate-500 uppercase tracking-widest mb-2 font-semibold">Filter Status</label>
                     <select name="status" class="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500/50 transition-colors appearance-none">
                         <option value="">Semua Status</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="success" {{ request('status') == 'success' ? 'selected' : '' }}>Success</option>
-                        <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
+                        <option value="PENDING_PROOF" {{ request('status') == 'PENDING_PROOF' ? 'selected' : '' }}>Pending (Menunggu Bukti)</option>
+                        <option value="SUCCESS"       {{ request('status') == 'SUCCESS'       ? 'selected' : '' }}>Success</option>
+                        <option value="REJECTED"      {{ request('status') == 'REJECTED'      ? 'selected' : '' }}>Rejected</option>
                     </select>
                 </div>
                 <div class="md:self-end flex gap-2">
                     <button type="submit" class="bg-purple-600/80 hover:bg-purple-600 text-purple-100 font-semibold px-6 py-2.5 rounded-xl transition-all">Filter</button>
                     @if(request()->hasAny(['search', 'status']))
-                    <a href="{{ route('admin.transactions') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center justify-center" title="Reset">✕</a>
+                    <a href="{{ route('admin.transactions') }}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center justify-center" title="Reset"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></a>
                     @endif
                 </div>
             </form>
@@ -69,13 +69,14 @@
                             <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Invoice & Waktu</th>
                             <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Data Pembeli</th>
                             <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Pesanan</th>
+                            <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Bukti Bayar</th>
                             <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Status</th>
                             <th class="px-6 py-4 text-left text-xs text-slate-500 uppercase tracking-widest font-semibold">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/40">
                         @forelse($transactions as $trx)
-                        <tr class="hover:bg-slate-800/30 transition-colors">
+                        <tr x-data="{ status: '{{ $trx->status }}', isLoading: false }" class="hover:bg-slate-800/30 transition-colors">
                             <td class="px-6 py-4" data-label="Invoice">
                                 <p class="font-mono text-sm text-purple-300 font-bold">{{ $trx->invoice_number }}</p>
                                 <p class="text-xs text-slate-500 mt-1">{{ $trx->created_at->format('d M Y, H:i') }}</p>
@@ -91,46 +92,78 @@
                             <td class="px-6 py-4" data-label="Pesanan">
                                 <p class="text-sm font-semibold text-cyan-300">{{ $trx->ticket->ticket_name }} <span class="text-slate-300 ml-1">×{{ $trx->quantity }}</span></p>
                                 <p class="text-sm font-bold text-slate-200 mt-1">Rp {{ number_format($trx->total_price, 0, ',', '.') }}</p>
-                                <p class="text-xs text-yellow-400 mt-0.5">Kode: {{ $trx->unique_code }}</p>
+                            </td>
+                            <td class="px-6 py-4" data-label="Bukti Bayar">
+                                @if($trx->payment_proof)
+                                    <a href="{{ asset('storage/proofs/' . $trx->payment_proof) }}"
+                                       target="_blank"
+                                       class="block w-16 h-16 rounded-lg overflow-hidden border border-purple-500/30 hover:border-purple-400 transition-all group relative"
+                                       title="Lihat bukti pembayaran">
+                                        <img src="{{ asset('storage/proofs/' . $trx->payment_proof) }}"
+                                             alt="Bukti bayar"
+                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        </div>
+                                    </a>
+                                @elseif($trx->status === 'PENDING_PROOF')
+                                    <span class="text-xs text-slate-600 italic">Belum diunggah</span>
+                                @else
+                                    <span class="text-xs text-slate-700">—</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4" data-label="Status">
-                                @php
-                                    $badgeMap = [
-                                        'pending' => 'bg-yellow-900/40 text-yellow-400 border-yellow-600/40',
-                                        'success' => 'bg-green-900/40 text-green-400 border-green-600/40',
-                                        'expired' => 'bg-red-900/40 text-red-400 border-red-600/40',
-                                    ];
-                                @endphp
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $badgeMap[$trx->status] ?? '' }}">
-                                    {{ ucfirst($trx->status) }}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border"
+                                      :class="{
+                                          'bg-cyan-900/40 text-cyan-400 border-cyan-600/40': status === 'PENDING_PROOF',
+                                          'bg-green-900/40 text-green-400 border-green-600/40': status === 'SUCCESS',
+                                          'bg-red-900/40 text-red-400 border-red-600/40': status === 'REJECTED'
+                                      }"
+                                      x-text="status">
                                 </span>
                             </td>
                             <td class="px-6 py-4" data-label="Aksi">
-                                @if($trx->isPending())
-                                <div class="flex flex-col gap-2 w-full md:w-max md:ml-auto">
-                                    <form method="POST" action="{{ route('admin.transaction.confirm', $trx->invoice_number) }}">
-                                        @csrf
-                                        <button class="w-full text-xs bg-green-600/20 text-green-400 border border-green-600/30 hover:bg-green-600/40 px-3 py-1.5 rounded-lg transition-all cursor-pointer" onclick="return confirm('Konfirmasi pembayaran {{ $trx->invoice_number }}?')">✅ Confirm</button>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.transaction.expire', $trx->invoice_number) }}">
-                                        @csrf
-                                        <button class="w-full text-xs bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/40 px-3 py-1.5 rounded-lg transition-all cursor-pointer" onclick="return confirm('Tandai expired?')">❌ Expire</button>
-                                    </form>
-                                </div>
-                                @elseif($trx->isSuccess())
-                                <div class="text-xs text-slate-500">
-                                    <p>{{ $trx->ticketCodes->count() }} QR Generated</p>
-                                    <p class="mt-0.5">{{ $trx->ticketCodes->where('is_scanned', true)->count() }} Scanned</p>
-                                </div>
-                                @else
-                                <span class="text-slate-600 text-xs">—</span>
-                                @endif
+                                <template x-if="status === 'PENDING_PROOF'">
+                                    <div>
+                                        <button @click="if(confirm('Konfirmasi dan generate tiket untuk {{ addslashes($trx->buyer_name) }}?')){ 
+                                            let oldStatus = status; 
+                                            status = 'SUCCESS'; 
+                                            isLoading = true; 
+                                            fetch('{{ route('admin.transaction.approve', $trx->invoice_number) }}', {
+                                                method: 'POST',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                                            }).then(res => { if(!res.ok) throw new Error(); isLoading = false; }).catch(() => { status = oldStatus; isLoading = false; alert('Gagal menyetujui transaksi.'); });
+                                        }" class="bg-green-600/20 hover:bg-green-600/40 border border-green-500/50 text-green-400 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50" :disabled="isLoading" data-tooltip="Setujui & Generate Tiket">
+                                            Approve
+                                        </button>
+                                        <button @click="if(confirm('Tolak transaksi ini?')){ 
+                                            let oldStatus = status; 
+                                            status = 'REJECTED'; 
+                                            isLoading = true; 
+                                            fetch('{{ route('admin.transaction.reject', $trx->invoice_number) }}', {
+                                                method: 'POST',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                                            }).then(res => { if(!res.ok) throw new Error(); isLoading = false; }).catch(() => { status = oldStatus; isLoading = false; alert('Gagal menolak transaksi.'); });
+                                        }" class="bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 text-red-400 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ml-1 disabled:opacity-50" :disabled="isLoading" data-tooltip="Tolak Pembayaran">
+                                            Reject
+                                        </button>
+                                    </div>
+                                </template>
+                                <template x-if="status === 'SUCCESS'">
+                                    <div class="text-xs text-slate-500">
+                                        <p>{{ $trx->ticketCodes->count() }} QR Generated</p>
+                                        <p class="mt-0.5">{{ $trx->ticketCodes->where('is_scanned', true)->count() }} Scanned</p>
+                                    </div>
+                                </template>
+                                <template x-if="status === 'REJECTED'">
+                                    <span class="text-slate-600 text-xs">—</span>
+                                </template>
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="5" class="px-6 py-16 text-center">
-                                <div class="text-4xl mb-3">📭</div>
+                                <div class="text-4xl mb-3"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 15h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H5V5h14m0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></div>
                                 <p class="text-slate-400 font-medium">Tidak ada transaksi ditemukan.</p>
                             </td>
                         </tr>

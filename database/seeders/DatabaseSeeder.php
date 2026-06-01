@@ -48,8 +48,8 @@ class DatabaseSeeder extends Seeder
         // TICKETS
         // -------------------------------------------------------
         Ticket::create([
-            'ticket_name'     => 'Tiket Biasa',
-            'price'           => 65000,
+            'ticket_name'     => 'Tiket Reguler',
+            'price'           => 110000,
             'quota'           => 600,
             'remaining_quota' => 600,
         ]);

@@ -3,7 +3,7 @@
 @section('title', 'Merchandise – SPECTA XXI')
 
 @section('content')
-<div class="min-h-screen bg-slate-950 text-slate-100" x-data="{ sidebarOpen: false, showAdd: false, editItem: null }">
+<div class="min-h-screen bg-slate-950 text-slate-100" x-data="{ sidebarOpen: false, showAdd: false, editItem: null, addPreview: null, editPreview: null, previewFile(event, target) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = e => { if(target === 'add') this.addPreview = e.target.result; else this.editPreview = e.target.result; }; reader.readAsDataURL(file); } }">
     {{-- Sidebar --}}
     @include('admin.partials.sidebar')
 
@@ -26,7 +26,7 @@
                 <h1 class="font-bold text-slate-200">Katalog Merchandise</h1>
             </div>
             <button @click.stop="showAdd = true" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-purple-600/20 transition-all flex items-center gap-2 cursor-pointer">
-                <span>➕</span> Tambah
+                <span><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg></span> Tambah
             </button>
         </header>
 
@@ -51,7 +51,21 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Foto Produk (JPG/PNG/WebP, maks 4MB)</label>
-                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+                        <div class="space-y-3">
+                            <div x-show="addPreview" class="relative rounded-xl overflow-hidden border border-slate-600 bg-slate-950">
+                                <img :src="addPreview" class="w-full h-40 object-contain">
+                                <button type="button" @click="addPreview = null; $el.closest('.space-y-3').querySelector('input[type=file]').value = ''" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-900/80 border border-slate-600 hover:border-red-500 rounded-lg p-1 text-slate-400 hover:text-red-400 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            <label x-show="!addPreview" class="flex flex-col items-center gap-2 border-2 border-dashed border-slate-700 hover:border-purple-500/60 rounded-xl p-6 text-center cursor-pointer transition-all bg-slate-950/50 hover:bg-purple-950/10">
+                                <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-xs text-slate-400">Klik untuk pilih foto</span>
+                                <span class="text-[10px] text-slate-600 uppercase tracking-wider">JPG / PNG / WebP · maks 4MB</span>
+                                <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="hidden" @change="previewFile($event, 'add')">
+                            </label>
+                            <input x-show="addPreview" type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer" @change="previewFile($event, 'add')">
+                        </div>
                         <p class="text-[10px] text-slate-500 mt-1">Otomatis dikonversi ke WebP</p>
                     </div>
                     <div class="flex gap-3 pt-2">
@@ -83,10 +97,20 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Ganti Foto (opsional)</label>
-                            <template x-if="editItem.image_url">
-                                <img :src="editItem.image_url" class="w-full h-32 object-cover rounded-xl mb-2 border border-slate-700">
-                            </template>
-                            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+                            <div class="space-y-3">
+                                <div class="relative rounded-xl overflow-hidden border border-slate-600 bg-slate-950" x-show="editPreview || editItem.image_url">
+                                    <img :src="editPreview || editItem.image_url" class="w-full h-40 object-contain" />
+                                    <button type="button" @click="editPreview = null; $el.closest('.space-y-3').querySelector('input[name=\'image\']').value = ''" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-900/80 border border-slate-600 hover:border-red-500 rounded-lg p-1 text-slate-400 hover:text-red-400 transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                                <label x-show="!editPreview && !editItem.image_url" class="flex flex-col items-center gap-2 border-2 border-dashed border-slate-700 hover:border-purple-500/60 rounded-xl p-6 text-center cursor-pointer transition-all bg-slate-950/50 hover:bg-purple-950/10">
+                                    <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <span class="text-xs text-slate-400">Klik untuk pilih foto</span>
+                                    <span class="text-[10px] text-slate-600 uppercase tracking-wider">JPG / PNG / WebP · maks 4MB</span>
+                                    <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="hidden" @change="previewFile($event, 'edit')" />
+                                </label>
+                            </div>
                             <p class="text-[10px] text-slate-500 mt-1">Otomatis dikonversi ke WebP. Kosongkan jika tidak ingin mengubah foto.</p>
                         </div>
                         <div class="flex gap-3 pt-2">
@@ -105,7 +129,7 @@
                     @if($merch->image_url)
                         <img src="{{ $merch->image_url }}" alt="{{ $merch->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
-                        <div class="text-6xl opacity-20 group-hover:scale-110 transition-transform duration-500">🛍️</div>
+                        <div class="text-6xl opacity-20 group-hover:scale-110 transition-transform duration-500"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6h-2c0-2.8-2.2-5-5-5S7 3.2 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2m-7-3c1.7 0 3 1.3 3 3H9c0-1.7 1.3-3 3-3m7 17H5V8h14zm-7-8c-1.7 0-3-1.3-3-3H7c0 2.8 2.2 5 5 5s5-2.2 5-5h-2c0 1.7-1.3 3-3 3"/></svg></div>
                     @endif
                     <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-slate-700/50">
                         <p class="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
@@ -140,7 +164,7 @@
             </div>
             @empty
             <div class="col-span-full py-20 text-center">
-                <div class="text-5xl mb-4">🛒</div>
+                <div class="text-5xl mb-4"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M17 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M1 2v2h2l3.6 7.59l-1.36 2.45c-.15.28-.24.61-.24.96a2 2 0 0 0 2 2h12v-2H7.42a.25.25 0 0 1-.25-.25q0-.075.03-.12L8.1 13h7.45c.75 0 1.41-.42 1.75-1.03l3.58-6.47c.07-.16.12-.33.12-.5a1 1 0 0 0-1-1H5.21l-.94-2M7 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2"/></svg></div>
                 <p class="text-slate-400 text-lg">Belum ada merchandise yang ditambahkan.</p>
             </div>
             @endforelse

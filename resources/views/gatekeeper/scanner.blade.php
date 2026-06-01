@@ -18,7 +18,7 @@
         {{-- Main Scanner Area --}}
         <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-4 shadow-2xl mb-6 relative overflow-hidden">
             {{-- Scanner Viewport --}}
-            <div id="reader" class="rounded-2xl overflow-hidden bg-black aspect-square w-full"></div>
+            <div id="reader" class="rounded-2xl overflow-hidden bg-black aspect-square w-full border-2 border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.6)]"></div>
             
             {{-- Processing Overlay --}}
             <div x-show="isProcessing" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center" x-cloak>
@@ -44,7 +44,7 @@
              }" x-cloak>
             
             {{-- Close btn --}}
-            <button @click="resetScanner()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-300">✕</button>
+            <button @click="resetScanner()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-300"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></button>
             
             <div class="text-center mb-4">
                 <div class="text-5xl mb-3" x-text="resultIcon()"></div>
@@ -52,7 +52,7 @@
                     :class="{
                         'text-green-400': result?.type === 'valid',
                         'text-red-400': result?.type === 'invalid',
-                        'text-yellow-400': result?.type === 'duplicate'
+                        'text-cyan-400': result?.type === 'duplicate'
                     }" x-text="resultTitle()"></h3>
                 <p class="text-slate-400 text-sm mt-1" x-text="result?.message"></p>
             </div>
@@ -78,9 +78,9 @@
 
             {{-- Duplicate details --}}
             <template x-if="result?.type === 'duplicate'">
-                <div class="bg-yellow-900/20 rounded-xl p-4 border border-yellow-700/30 text-center">
-                    <p class="text-xs text-yellow-500/80 uppercase tracking-widest mb-1">Waktu Scan Pertama</p>
-                    <p class="font-mono text-yellow-400 font-bold" x-text="result?.data?.scanned_at"></p>
+                <div class="bg-cyan-900/20 rounded-xl p-4 border border-cyan-700/30 text-center">
+                    <p class="text-xs text-cyan-400/80 uppercase tracking-widest mb-1">Waktu Scan Pertama</p>
+                    <p class="font-mono text-cyan-400 font-bold" x-text="result?.data?.scanned_at"></p>
                 </div>
             </template>
 
@@ -148,16 +148,20 @@
                     if (response.ok) {
                         this.result = { type: 'valid', message: data.message, data: data };
                         this.playBeep('success');
+                        setTimeout(() => { if(this.result?.type === 'valid') this.resetScanner() }, 3000);
                     } else if (response.status === 409) {
                         this.result = { type: 'duplicate', message: data.message, data: data };
                         this.playBeep('error');
+                        setTimeout(() => { if(this.result?.type === 'duplicate') this.resetScanner() }, 3000);
                     } else {
                         this.result = { type: 'invalid', message: data.message || 'Kode tidak valid', data: null };
                         this.playBeep('error');
+                        setTimeout(() => { if(this.result?.type === 'invalid') this.resetScanner() }, 3000);
                     }
                 } catch (error) {
                     this.result = { type: 'invalid', message: 'Koneksi terputus. Coba lagi.', data: null };
                     this.playBeep('error');
+                    setTimeout(() => { if(this.result?.type === 'invalid') this.resetScanner() }, 3000);
                 } finally {
                     this.isProcessing = false;
                 }
@@ -169,9 +173,9 @@
             },
 
             resultIcon() {
-                if(this.result?.type === 'valid') return '✅';
-                if(this.result?.type === 'invalid') return '❌';
-                if(this.result?.type === 'duplicate') return '⚠️';
+                if(this.result?.type === 'valid') return '<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg>';
+                if(this.result?.type === 'invalid') return '<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c5.53 0 10 4.47 10 10s-4.47 10-10 10S2 17.53 2 12S6.47 2 12 2m3.59 5L12 10.59L8.41 7L7 8.41L10.59 12L7 15.59L8.41 17L12 13.41L15.59 17L17 15.59L13.41 12L17 8.41z"/></svg>';
+                if(this.result?.type === 'duplicate') return '<svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M13 14h-2V9h2m0 9h-2v-2h2M1 21h22L12 2z"/></svg>';
                 return '';
             },
 
@@ -193,16 +197,30 @@
                     gain.connect(ctx.destination);
                     
                     if (type === 'success') {
-                        osc.frequency.value = 880; // A5
+                        // Pleasant double chime
                         osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+                        osc.frequency.setValueAtTime(1108.73, ctx.currentTime + 0.1); // C#6
+                        
+                        gain.gain.setValueAtTime(0, ctx.currentTime);
+                        gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.02);
+                        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+                        
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.3);
                     } else {
-                        osc.frequency.value = 200; // Low frequency for error
+                        // Harsh error buzz
                         osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(150, ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3);
+                        
+                        gain.gain.setValueAtTime(0, ctx.currentTime);
+                        gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                        
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.3);
                     }
-                    
-                    osc.start();
-                    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
-                    osc.stop(ctx.currentTime + 0.5);
                 } catch(e) { console.log('Audio disabled') }
             }
         };
