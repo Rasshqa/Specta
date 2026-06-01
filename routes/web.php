@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tickets',    [\App\Http\Controllers\TicketOrderController::class, 'index'])->name('tickets.index');
     Route::post('/checkout',  [\App\Http\Controllers\TicketOrderController::class, 'checkout'])->name('ticket.checkout');
     Route::get('/my-tickets', [\App\Http\Controllers\UserDashboardController::class, 'myTickets'])->name('user.dashboard');
+    Route::get('/ticket/download/{token}', [\App\Http\Controllers\TicketOrderController::class, 'downloadTicket'])->name('ticket.download');
 });
 
 // ─── Payment Pages (Public - accessible via invoice link) ─────────────────────
@@ -72,8 +73,7 @@ Route::get('/payment/{invoice}',        [PaymentController::class, 'show'])->nam
 Route::get('/payment/{invoice}/status', [PaymentController::class, 'status'])->name('payment.status');
 Route::post('/payment/{invoice}/proof', [\App\Http\Controllers\TicketOrderController::class, 'uploadProof'])->name('payment.proof.upload');
 
-// ─── Secure E-Ticket Download ─────────────────────────────────────────────────
-Route::get('/ticket/download/{token}', [\App\Http\Controllers\TicketOrderController::class, 'downloadTicket'])->name('ticket.download');
+// ─── Secure E-Ticket Download (Moved to protected group) ──────────────────────
 
 // ─── Gatekeeper / QR Scanner (Admin Only) ────────────────────────────────────
 Route::middleware(['auth', 'admin'])->group(function () {

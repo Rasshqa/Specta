@@ -257,6 +257,13 @@ class TicketOrderController extends Controller
             ->where('status', '=', 'SUCCESS')
             ->firstOrFail();
 
+        // ─── Security Check ──────────────────────────────────────────────────
+        // Ensure the logged-in user is either an Admin, or the email matches the buyer's email
+        $user = auth()->user();
+        if (!$user->isAdmin() && strtolower($user->email) !== strtolower($transaction->buyer_email)) {
+            abort(403, 'Akses Ditolak: Anda login dengan email yang berbeda dari pembeli tiket ini.');
+        }
+
         $pdf = Pdf::loadView('tickets.pdf', compact('transaction'))
             ->setPaper('a4', 'portrait');
 
