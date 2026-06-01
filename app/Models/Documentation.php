@@ -15,6 +15,11 @@ class Documentation extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'event_date' => 'date',
+        'is_active'  => 'boolean',
+    ];
+
     public function getFileUrlAttribute()
     {
         return asset('storage/' . $this->file_path);

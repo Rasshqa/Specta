@@ -42,6 +42,7 @@
         @php
             $infoItems = [
                 ['icon'=>'📢','label'=>'Pengumuman','route'=>'admin.informations.index'],
+                ['icon'=>'📅','label'=>'Timeline','route'=>'admin.infocenter.timelines'],
                 ['icon'=>'🎟️','label'=>'Eskul SMANSA','route'=>'admin.infocenter.eskul'],
                 ['icon'=>'🏆','label'=>'Pemenang Lomba','route'=>'admin.infocenter.winners'],
                 ['icon'=>'📸','label'=>'Dokumentasi','route'=>'admin.infocenter.docs'],
@@ -62,13 +63,21 @@
     </nav>
 
     {{-- Footer --}}
-    <div class="flex-shrink-0 px-6 py-5 border-t border-slate-800/60">
+    <div class="flex-shrink-0 px-6 py-5 border-t border-slate-800/60 space-y-3">
+        <a
+            href="/"
+            target="_blank"
+            class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-gradient-to-r from-purple-900/40 to-cyan-900/40 hover:from-purple-800/50 hover:to-cyan-800/50 text-slate-200 hover:text-white rounded-xl text-xs uppercase tracking-wider font-bold border border-purple-500/20 hover:border-purple-500/40 transition-all duration-200 shadow-md text-center"
+        >
+            <span>🌐</span> Halaman Utama
+        </a>
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button
                 id="btn-logout"
                 type="submit"
-                class="w-full flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
+                class="w-full flex items-center justify-center gap-2 py-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
             >
                 <span>🚪</span> Keluar
             </button>

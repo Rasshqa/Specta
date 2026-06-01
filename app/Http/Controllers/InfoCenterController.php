@@ -247,4 +247,74 @@ class InfoCenterController extends Controller
 
         return $data;
     }
+
+    // ─── TIMELINES ───────────────────────────────────────────────────────────────
+
+    public function timelinesIndex()
+    {
+        $timelines = Timeline::orderBy('year', 'desc')->get();
+        return view('admin.infocenter.timelines', compact('timelines'));
+    }
+
+    public function timelinesStore(Request $request)
+    {
+        $data = $request->validate([
+            'year'        => 'required|string|max:4',
+            'title'       => 'required|string|max:150',
+            'subtitle'    => 'nullable|string|max:150',
+            'description' => 'required|string',
+            'is_current'  => 'nullable|boolean',
+            'is_active'   => 'nullable|boolean',
+            'sort_order'  => 'nullable|integer',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('infocenter/timelines', 'public');
+        }
+        
+        $data['is_current'] = $request->boolean('is_current', false);
+        $data['is_active']  = $request->boolean('is_active', true);
+        $data['sort_order'] = $request->input('sort_order', 0);
+        unset($data['image']);
+
+        Timeline::create($data);
+        return back()->with('success', 'Timeline berhasil ditambahkan.');
+    }
+
+    public function timelinesUpdate(Request $request, Timeline $timeline)
+    {
+        $data = $request->validate([
+            'year'        => 'required|string|max:4',
+            'title'       => 'required|string|max:150',
+            'subtitle'    => 'nullable|string|max:150',
+            'description' => 'required|string',
+            'is_current'  => 'nullable|boolean',
+            'is_active'   => 'nullable|boolean',
+            'sort_order'  => 'nullable|integer',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($timeline->image_path) Storage::disk('public')->delete($timeline->image_path);
+            $data['image_path'] = $request->file('image')->store('infocenter/timelines', 'public');
+        }
+
+        $data['is_current'] = $request->boolean('is_current', false);
+        $data['is_active']  = $request->boolean('is_active', true);
+        $data['sort_order'] = $request->input('sort_order', 0);
+        unset($data['image']);
+
+        $timeline->update($data);
+        return back()->with('success', 'Timeline berhasil diperbarui.');
+    }
+
+    public function timelinesDestroy(Timeline $timeline)
+    {
+        if ($timeline->image_path) {
+            Storage::disk('public')->delete($timeline->image_path);
+        }
+        $timeline->delete();
+        return back()->with('success', 'Timeline berhasil dihapus.');
+    }
 }

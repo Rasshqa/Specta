@@ -15,6 +15,13 @@ use App\Models\Documentation;
 use App\Http\Controllers\MerchController;
 use App\Http\Controllers\DocsController;
 
+Route::get('/test-db', function () {
+    return response()->json([
+        'informations' => \App\Models\Information::all(),
+        'timelines' => \App\Models\Timeline::all(),
+    ]);
+});
+
 // ─── Public Routes ────────────────────────────────────────────────────────────
 Route::get('/', function () {
     $merchandises   = Merchandise::all();
@@ -83,4 +90,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/infocenter/docs', [InfoCenterController::class, 'docsIndex'])->name('infocenter.docs');
     Route::post('/infocenter/docs', [InfoCenterController::class, 'docsStore'])->name('infocenter.docs.store');
     Route::delete('/infocenter/docs/{documentation}', [InfoCenterController::class, 'docsDestroy'])->name('infocenter.docs.destroy');
+
+    Route::get('/infocenter/timelines', [InfoCenterController::class, 'timelinesIndex'])->name('infocenter.timelines');
+    Route::post('/infocenter/timelines', [InfoCenterController::class, 'timelinesStore'])->name('infocenter.timelines.store');
+    Route::post('/infocenter/timelines/{timeline}', [InfoCenterController::class, 'timelinesUpdate'])->name('infocenter.timelines.update');
+    Route::delete('/infocenter/timelines/{timeline}', [InfoCenterController::class, 'timelinesDestroy'])->name('infocenter.timelines.destroy');
 });
