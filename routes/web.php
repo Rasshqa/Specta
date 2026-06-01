@@ -107,7 +107,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/infocenter/winners/{winner}',   [InfoCenterController::class, 'winnersUpdate'])->name('infocenter.winners.update');
     Route::delete('/infocenter/winners/{winner}', [InfoCenterController::class, 'winnersDestroy'])->name('infocenter.winners.destroy');
 
-<<<<<<< HEAD
     Route::get('/infocenter/docs', [InfoCenterController::class, 'docsIndex'])->name('infocenter.docs');
     Route::post('/infocenter/docs', [InfoCenterController::class, 'docsStore'])->name('infocenter.docs.store');
     Route::delete('/infocenter/docs/{documentation}', [InfoCenterController::class, 'docsDestroy'])->name('infocenter.docs.destroy');
@@ -116,9 +115,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/infocenter/timelines', [InfoCenterController::class, 'timelinesStore'])->name('infocenter.timelines.store');
     Route::post('/infocenter/timelines/{timeline}', [InfoCenterController::class, 'timelinesUpdate'])->name('infocenter.timelines.update');
     Route::delete('/infocenter/timelines/{timeline}', [InfoCenterController::class, 'timelinesDestroy'])->name('infocenter.timelines.destroy');
-=======
     Route::get('/infocenter/docs',                [InfoCenterController::class, 'docsIndex'])->name('infocenter.docs');
     Route::post('/infocenter/docs',               [InfoCenterController::class, 'docsStore'])->name('infocenter.docs.store');
     Route::delete('/infocenter/docs/{documentation}',[InfoCenterController::class, 'docsDestroy'])->name('infocenter.docs.destroy');
->>>>>>> temp-branch
 });
