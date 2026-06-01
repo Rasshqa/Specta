@@ -15,23 +15,16 @@ use App\Models\Documentation;
 use App\Http\Controllers\MerchController;
 use App\Http\Controllers\DocsController;
 
-Route::get('/test-db', function () {
-    return response()->json([
-        'informations' => \App\Models\Information::all(),
-        'timelines' => \App\Models\Timeline::all(),
-    ]);
-});
-
 // ─── Public Routes ────────────────────────────────────────────────────────────
 Route::get('/', function () {
-    $ttl = 3600; // 1 hour caching
-    $merchandises   = cache()->remember('home_merch', $ttl, fn() => Merchandise::all());
-    $eskuls         = cache()->remember('home_eskuls', $ttl, fn() => EskulProfile::active()->get());
-    $winners        = cache()->remember('home_winners', $ttl, fn() => Winner::active()->get());
-    $timelines      = cache()->remember('home_timelines', $ttl, fn() => Timeline::orderBy('year', 'desc')->get());
-    $docsPreviews   = cache()->remember('home_docs', $ttl, fn() => Documentation::active()->latest()->take(6)->get());
-    $announcements  = cache()->remember('home_announcements', $ttl, fn() => \App\Models\Information::where('is_active', true)->latest()->get());
-    // Cached Ticket Quota Indicator (30 seconds)
+    $merchandises   = Merchandise::all();
+    $eskuls         = EskulProfile::active()->get();
+    $winners        = Winner::active()->get();
+    $timelines      = Timeline::orderBy('year', 'desc')->get();
+    $docsPreviews   = Documentation::active()->latest()->take(6)->get();
+    $announcements  = \App\Models\Information::where('is_active', true)->latest()->get();
+
+    // Cached Ticket Quota Indicator (30 seconds to prevent DB overload during ticket sales)
     $quotaData = cache()->remember('ticket_quota', 30, function () {
         $totalCapacity = 1500;
         $sold          = \App\Models\Transaction::where('status', 'SUCCESS')->sum('quantity');
