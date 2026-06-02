@@ -56,7 +56,7 @@ class TransactionApprovalController extends Controller
                 do {
                     $code   = 'TKT-' . strtoupper(Str::random(5)) . '-' . rand(10000, 99999) . '-' . ($i + 1);
                     $exists = in_array($code, array_column($codes, 'unique_ticket_code'))
-                              || TicketCode::where('unique_ticket_code', '=', $code)->exists();
+                              || TicketCode::query()->where('unique_ticket_code', '=', $code)->exists();
                     $attempts++;
                 } while ($exists && $attempts < 5);
 

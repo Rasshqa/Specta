@@ -90,9 +90,13 @@
                             $pct  = $ticket->quota > 0 ? round(($sold / $ticket->quota) * 100) : 0;
                         @endphp
                         <div>
-                            <div class="flex justify-between text-sm mb-1.5">
+                            <div class="flex justify-between items-center text-sm mb-1.5">
                                 <span class="text-slate-300 font-medium">{{ $ticket->ticket_name }}</span>
-                                <span class="text-slate-400">{{ $sold }}/{{ $ticket->quota }}</span>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-purple-400 font-bold font-mono text-xs">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
+                                    <button @click="openPriceModal({{ $ticket->id }}, {{ $ticket->price }}, '{{ $ticket->ticket_name }}')" class="text-[10px] bg-purple-600/20 text-purple-400 hover:bg-purple-600/40 border border-purple-500/30 px-2 py-0.5 rounded transition-colors">Edit Harga</button>
+                                    <span class="text-slate-400 text-xs">{{ $sold }}/{{ $ticket->quota }}</span>
+                                </div>
                             </div>
                             <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
                                 <div
@@ -209,6 +213,42 @@
             <div x-show="message" x-transition class="mt-4 p-4 rounded-xl text-center text-sm font-bold border" :class="isSuccess ? 'bg-green-900/40 text-green-400 border-green-500/30' : 'bg-red-900/40 text-red-400 border-red-500/30'">
                 <span x-text="message"></span>
             </div>
+        </div>
+    </div>
+
+    {{-- Edit Price Modal --}}
+    <div x-data="{ 
+            isOpen: false, 
+            ticketId: '', 
+            ticketName: '', 
+            price: 0,
+            openModal(id, currentPrice, name) {
+                this.ticketId = id;
+                this.price = currentPrice;
+                this.ticketName = name;
+                this.isOpen = true;
+            }
+         }"
+         @open-price-modal.window="openModal($event.detail.id, $event.detail.price, $event.detail.name)"
+         x-init="window.openPriceModal = openModal.bind($data)"
+         x-show="isOpen" 
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm"
+         style="display: none;">
+        
+        <div @click.away="isOpen = false" class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
+            <button @click="isOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-white"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></button>
+            
+            <h2 class="text-xl font-bold mb-1">Edit Harga Tiket</h2>
+            <p class="text-sm text-slate-500 mb-5" x-text="ticketName"></p>
+            
+            <form :action="`/admin/ticket/${ticketId}/price`" method="POST">
+                @csrf
+                <div class="mb-5">
+                    <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Harga Tiket (Rp)</label>
+                    <input type="number" name="price" x-model="price" min="0" required class="w-full bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-purple-500/50 transition-colors">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-900/30 transition-all text-sm uppercase tracking-wider">Simpan Harga</button>
+            </form>
         </div>
     </div>
 </div>

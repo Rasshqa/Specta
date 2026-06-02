@@ -8,6 +8,7 @@ use App\Services\FirebaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -15,10 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class TicketOrderController extends Controller
 {
-    /**
-     * The rigid ticket price — enforced globally. No bypass allowed.
-     */
-    private const TICKET_PRICE = 110000;
+    // Price is now dynamic based on Ticket model
 
     /**
      * Display the ticket/buy landing page.
@@ -63,6 +61,8 @@ class TicketOrderController extends Controller
                     throw new \RuntimeException("Tidak ada tiket yang aktif saat ini.");
                 }
 
+                /** @var \App\Models\Ticket $ticket */
+
                 if (! $ticket->hasAvailableQuota($validated['quantity'])) {
                     throw new \RuntimeException(
                         "Kuota tiket '{$ticket->ticket_name}' tidak mencukupi. " .
@@ -72,12 +72,11 @@ class TicketOrderController extends Controller
 
                 $invoiceNumber = $this->generateInvoiceNumber();
 
-                // Rigid price — IDR 110,000 per ticket, no exceptions
-                $unitPrice  = self::TICKET_PRICE;
+                $unitPrice  = $ticket->price;
                 $basePrice  = $unitPrice * $validated['quantity'];
                 $totalPrice = $basePrice;
 
-                $ticket->decrement('remaining_quota', $validated['quantity']);
+                $ticket->decrement('remaining_quota', $validated['quantity'], []);
 
                 return Transaction::query()->create([
                     'ticket_id'      => $ticket->id,
@@ -259,7 +258,8 @@ class TicketOrderController extends Controller
 
         // ─── Security Check ──────────────────────────────────────────────────
         // Ensure the logged-in user is either an Admin, or the email matches the buyer's email
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         if (!$user->isAdmin() && strtolower($user->email) !== strtolower($transaction->buyer_email)) {
             abort(403, 'Akses Ditolak: Anda login dengan email yang berbeda dari pembeli tiket ini.');
         }

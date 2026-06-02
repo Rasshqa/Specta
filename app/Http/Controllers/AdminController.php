@@ -65,6 +65,24 @@ class AdminController extends Controller
     }
 
     /**
+     * Update the price of a ticket.
+     */
+    public function updateTicketPrice(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'price' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $ticket->update(['price' => $request->price]);
+
+        cache()->forget('admin_tickets_list');
+        cache()->forget('tickets_available');
+        cache()->forget('ticket_quota');
+
+        return back()->with('success', 'Harga tiket ' . $ticket->ticket_name . ' berhasil diupdate.');
+    }
+
+    /**
      * List all transactions with optional filtering.
      */
     public function transactions(Request $request)
@@ -149,7 +167,7 @@ class AdminController extends Controller
 
     public function merchandiseDestroy(Merchandise $merchandise)
     {
-        $merchandise->delete();
+        Merchandise::destroy($merchandise->getKey());
 
         return back()->with('success', 'Merchandise berhasil dihapus.');
     }

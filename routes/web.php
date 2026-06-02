@@ -22,14 +22,14 @@ Route::get('/', function () {
     $winners        = Winner::active()->get();
     $timelines      = Timeline::orderBy('year', 'desc')->get();
     $docsPreviews   = Documentation::active()->latest()->take(6)->get();
-    $announcements  = \App\Models\Information::where('is_active', true)->latest()->get();
+    $announcements  = \App\Models\Information::query()->where('is_active', true)->latest()->get();
 
     // Cached Ticket Quota Indicator (30 seconds to prevent DB overload during ticket sales)
     $quotaData = cache()->remember('ticket_quota', 30, function () {
-        $totalCapacity = 1500;
-        $sold          = \App\Models\Transaction::where('status', 'SUCCESS')->sum('quantity');
-        $remaining     = max(0, $totalCapacity - $sold);
-        $percentage    = ($sold / $totalCapacity) * 100;
+        $totalCapacity = \App\Models\Ticket::query()->sum('quota') ?: 1500;
+        $remaining     = \App\Models\Ticket::query()->sum('remaining_quota');
+        $sold          = max(0, $totalCapacity - $remaining);
+        $percentage    = $totalCapacity > 0 ? ($sold / $totalCapacity) * 100 : 0;
 
         return (object)[
             'capacity'   => $totalCapacity,
@@ -84,6 +84,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // ─── Admin Panel (Protected) ─────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard',    [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::post('/ticket/{ticket}/price', [AdminController::class, 'updateTicketPrice'])->name('ticket.updatePrice');
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
     Route::post('/transaction/{invoice}/approve', [\App\Http\Controllers\Admin\TransactionApprovalController::class, 'approve'])->name('transaction.approve');
     Route::post('/transaction/{invoice}/reject',  [\App\Http\Controllers\Admin\TransactionApprovalController::class, 'reject'])->name('transaction.reject');
