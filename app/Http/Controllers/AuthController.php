@@ -80,9 +80,9 @@ class AuthController extends Controller
             $user = Auth::user();
 
             if ($user->isAdmin()) {
-                return redirect()->intended(route('admin.dashboard'));
+                return redirect()->route('admin.dashboard');
             } elseif ($user->isGatekeeper()) {
-                return redirect()->intended(route('gatekeeper.index'));
+                return redirect()->route('gatekeeper.index');
             }
 
             return redirect()->intended(route('home'));

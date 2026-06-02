@@ -84,7 +84,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // ─── Admin Panel (Protected) ─────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard',    [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::post('/ticket/{ticket}/price', [AdminController::class, 'updateTicketPrice'])->name('ticket.updatePrice');
+    Route::post('/ticket/{ticket}/update', [AdminController::class, 'updateTicket'])->name('ticket.update');
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
     Route::post('/transaction/{invoice}/approve', [\App\Http\Controllers\Admin\TransactionApprovalController::class, 'approve'])->name('transaction.approve');
     Route::post('/transaction/{invoice}/reject',  [\App\Http\Controllers\Admin\TransactionApprovalController::class, 'reject'])->name('transaction.reject');

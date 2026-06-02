@@ -65,21 +65,33 @@ class AdminController extends Controller
     }
 
     /**
-     * Update the price of a ticket.
+     * Update the price and quota of a ticket.
      */
-    public function updateTicketPrice(Request $request, Ticket $ticket)
+    public function updateTicket(Request $request, Ticket $ticket)
     {
         $request->validate([
             'price' => ['required', 'numeric', 'min:0'],
+            'quota' => ['required', 'integer', 'min:1'],
         ]);
 
-        $ticket->update(['price' => $request->price]);
+        $sold = $ticket->quota - $ticket->remaining_quota;
+        if ($request->quota < $sold) {
+            return back()->with('error', "Kuota total tidak boleh kurang dari jumlah tiket yang sudah terjual ($sold).");
+        }
+
+        $newRemainingQuota = $ticket->remaining_quota + ($request->quota - $ticket->quota);
+
+        $ticket->update([
+            'price' => $request->price,
+            'quota' => $request->quota,
+            'remaining_quota' => $newRemainingQuota,
+        ]);
 
         cache()->forget('admin_tickets_list');
         cache()->forget('tickets_available');
         cache()->forget('ticket_quota');
 
-        return back()->with('success', 'Harga tiket ' . $ticket->ticket_name . ' berhasil diupdate.');
+        return back()->with('success', 'Harga dan kuota tiket ' . $ticket->ticket_name . ' berhasil diupdate.');
     }
 
     /**

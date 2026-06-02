@@ -94,7 +94,7 @@
                                 <span class="text-slate-300 font-medium">{{ $ticket->ticket_name }}</span>
                                 <div class="flex items-center gap-3">
                                     <span class="text-purple-400 font-bold font-mono text-xs">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
-                                    <button @click="openPriceModal({{ $ticket->id }}, {{ $ticket->price }}, '{{ $ticket->ticket_name }}')" class="text-[10px] bg-purple-600/20 text-purple-400 hover:bg-purple-600/40 border border-purple-500/30 px-2 py-0.5 rounded transition-colors">Edit Harga</button>
+                                    <button @click="openPriceModal({{ $ticket->id }}, {{ $ticket->price }}, {{ $ticket->quota }}, '{{ $ticket->ticket_name }}')" class="text-[10px] bg-purple-600/20 text-purple-400 hover:bg-purple-600/40 border border-purple-500/30 px-2 py-0.5 rounded transition-colors">Edit Tiket</button>
                                     <span class="text-slate-400 text-xs">{{ $sold }}/{{ $ticket->quota }}</span>
                                 </div>
                             </div>
@@ -216,21 +216,25 @@
         </div>
     </div>
 
-    {{-- Edit Price Modal --}}
+    {{-- Edit Ticket Modal --}}
     <div x-data="{ 
             isOpen: false, 
             ticketId: '', 
             ticketName: '', 
             price: 0,
-            openModal(id, currentPrice, name) {
+            quota: 0,
+            init() {
+                window.openPriceModal = this.openModal.bind(this);
+            },
+            openModal(id, currentPrice, currentQuota, name) {
                 this.ticketId = id;
                 this.price = currentPrice;
+                this.quota = currentQuota;
                 this.ticketName = name;
                 this.isOpen = true;
             }
          }"
-         @open-price-modal.window="openModal($event.detail.id, $event.detail.price, $event.detail.name)"
-         x-init="window.openPriceModal = openModal.bind($data)"
+         @open-price-modal.window="openModal($event.detail.id, $event.detail.price, $event.detail.quota, $event.detail.name)"
          x-show="isOpen" 
          class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm"
          style="display: none;">
@@ -238,16 +242,20 @@
         <div @click.away="isOpen = false" class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
             <button @click="isOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-white"><svg class="inline align-middle w-[1em] h-[1em]" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></button>
             
-            <h2 class="text-xl font-bold mb-1">Edit Harga Tiket</h2>
+            <h2 class="text-xl font-bold mb-1">Edit Tiket</h2>
             <p class="text-sm text-slate-500 mb-5" x-text="ticketName"></p>
             
-            <form :action="`/admin/ticket/${ticketId}/price`" method="POST">
+            <form :action="`/admin/ticket/${ticketId}/update`" method="POST">
                 @csrf
-                <div class="mb-5">
+                <div class="mb-4">
                     <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Harga Tiket (Rp)</label>
                     <input type="number" name="price" x-model="price" min="0" required class="w-full bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-purple-500/50 transition-colors">
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-900/30 transition-all text-sm uppercase tracking-wider">Simpan Harga</button>
+                <div class="mb-6">
+                    <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Total Kuota</label>
+                    <input type="number" name="quota" x-model="quota" min="1" required class="w-full bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-cyan-500/50 transition-colors">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-900/30 transition-all text-sm uppercase tracking-wider">Simpan Perubahan</button>
             </form>
         </div>
     </div>
