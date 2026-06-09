@@ -20,5 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // File terlalu besar → tampilkan halaman 413 custom
+        $exceptions->renderable(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, $request) {
+            return response()->view('errors.413', [], 413);
+        });
     })->create();
