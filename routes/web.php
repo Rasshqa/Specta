@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/payment/{invoice}',        [PaymentController::class, 'show'])->name('payment.show');
 Route::get('/payment/{invoice}/status', [PaymentController::class, 'status'])->name('payment.status');
 Route::post('/payment/{invoice}/proof', [\App\Http\Controllers\TicketOrderController::class, 'uploadProof'])->name('payment.proof.upload');
+Route::get('/payment/{invoice}/proof', fn (string $invoice) => redirect()->route('payment.show', $invoice));
 
 // ─── Secure E-Ticket Download (Moved to protected group) ──────────────────────
 

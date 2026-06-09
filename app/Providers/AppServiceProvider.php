@@ -28,11 +28,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('auth_strict', function (Request $request) {
             return Limit::perMinute(5)
                 ->by($request->ip())
-                ->response(function () {
-                    return redirect()->route('login')
-                        ->withErrors([
-                            'email' => 'Terlalu banyak percobaan. Silakan tunggu 1 menit lalu coba lagi.',
-                        ]);
+                ->response(function (Request $request, array $headers) {
+                    return response()
+                        ->view('errors.429', [], 429)
+                        ->withHeaders($headers);
                 });
         });
     }
