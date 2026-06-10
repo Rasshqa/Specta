@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Merchandise;
-use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,38 +20,32 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminUserSeeder::class);
 
         // -------------------------------------------------------
-        // USERS — 1 Admin + 2 Gatekeepers
+        // USERS — Gatekeepers
         // -------------------------------------------------------
-        User::create([
-            'name'     => 'Admin SPECTA',
-            'email'    => 'admin@specta-xxi.com',
-            'password' => Hash::make('Specta@Admin2026!'),
-            'role'     => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'gate1@specta-xxi.com'],
+            [
+                'name'     => 'Gatekeeper 1',
+                'email'    => 'gate1@specta-xxi.com',
+                'password' => Hash::make('Specta@Gate12026!'),
+                'role'     => 'gatekeeper',
+            ]
+        );
 
-        User::create([
-            'name'     => 'Gatekeeper 1',
-            'email'    => 'gate1@specta-xxi.com',
-            'password' => Hash::make('Specta@Gate12026!'),
-            'role'     => 'gatekeeper',
-        ]);
-
-        User::create([
-            'name'     => 'Gatekeeper 2',
-            'email'    => 'gate2@specta-xxi.com',
-            'password' => Hash::make('Specta@Gate22026!'),
-            'role'     => 'gatekeeper',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'gate2@specta-xxi.com'],
+            [
+                'name'     => 'Gatekeeper 2',
+                'email'    => 'gate2@specta-xxi.com',
+                'password' => Hash::make('Specta@Gate22026!'),
+                'role'     => 'gatekeeper',
+            ]
+        );
 
         // -------------------------------------------------------
-        // TICKETS
+        // TICKETS — sudah di-handle oleh migration simplify_tickets_table
+        // Jangan insert ulang di sini untuk menghindari duplikasi!
         // -------------------------------------------------------
-        Ticket::create([
-            'ticket_name'     => 'Tiket Reguler',
-            'price'           => 110000,
-            'quota'           => 600,
-            'remaining_quota' => 600,
-        ]);
 
 
         // -------------------------------------------------------
