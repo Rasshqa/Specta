@@ -1123,7 +1123,7 @@
 
     <!-- ─── FLOATING CS BUTTON ─── -->
     <div x-data="{
-        csNumbers: ['6281223660277', '6282118377317'],
+        csNumbers: ['6287780250072', '6282119447179'],
         get randomCs() { return this.csNumbers[Math.floor(Math.random() * this.csNumbers.length)]; }
     }" class="fixed bottom-6 right-6 z-[100]">
         <a :href="'https://wa.me/' + randomCs + '?text=' + encodeURIComponent('Halo Admin Specta XXI, saya butuh bantuan informasi terkait event ini.')"
