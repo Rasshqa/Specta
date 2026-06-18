@@ -1126,7 +1126,7 @@
         csNumbers: ['6287780250072', '6282119447179'],
         get randomCs() { return this.csNumbers[Math.floor(Math.random() * this.csNumbers.length)]; }
     }" class="fixed bottom-6 right-6 z-[100]">
-        <a :href="'https://wa.me/' + randomCs + '?text=' + encodeURIComponent('Halo Admin Specta XXI, saya butuh bantuan informasi terkait event ini.')"
+        <a :href="'https://wa.me/' + randomCs + '?text=' + encodeURIComponent('Halo dengan Admin Specta XXI, saya membutuhkan bantuan terkait informasi event ini.')"
            target="_blank"
            class="group flex items-center justify-center w-14 h-14 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:shadow-[0_0_30px_rgba(147,51,234,0.6)] transition-all duration-300 hover:scale-110"
            title="Hubungi Customer Service">
