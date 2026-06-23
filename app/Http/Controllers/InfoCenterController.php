@@ -176,7 +176,7 @@ class InfoCenterController extends Controller
             'title'       => 'required|string|max:150',
             'description' => 'nullable|string',
             'event_date'  => 'nullable|date|after:1900-01-01|before:2100-01-01',
-            'file'        => 'required|file|max:51200', // 50MB max, check MIME manually
+            'file'        => 'required|file|max:15360', // 15MB max, check MIME manually
         ]);
 
         $file = $request->file('file');
