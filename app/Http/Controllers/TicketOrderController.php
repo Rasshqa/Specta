@@ -117,11 +117,11 @@ class TicketOrderController extends Controller
     public function uploadProof(Request $request, string $invoice): RedirectResponse
     {
         $request->validate([
-            'payment_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'payment_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:15360'],
         ], [
             'payment_proof.required' => 'Harap unggah bukti pembayaran.',
             'payment_proof.mimes'    => 'Format file harus JPG, PNG, atau WEBP.',
-            'payment_proof.max'      => 'Ukuran file maksimal 10MB.',
+            'payment_proof.max'      => 'Ukuran file maksimal 15MB.',
         ]);
 
         $transaction = Transaction::query()->where('invoice_number', '=', $invoice)
