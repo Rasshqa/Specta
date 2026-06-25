@@ -84,7 +84,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-slate-300 font-semibold uppercase tracking-wide text-sm">Total Transfer</p>
-                                <p class="text-xs text-slate-500 mt-1">{{ $transaction->quantity }} × Rp 100.000</p>
+                                <p class="text-xs text-slate-500 mt-1">{{ $transaction->quantity }} × Rp {{ number_format($transaction->ticket->price, 0, ',', '.') }}</p>
                             </div>
                             <p class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300 font-mono">
                                 Rp {{ number_format($transaction->total_price, 0, ',', '.') }}
