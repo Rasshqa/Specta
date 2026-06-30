@@ -310,7 +310,7 @@
 
         {{-- WhatsApp Contact Support --}}
         <div class="mt-8 text-center flex flex-col items-center" x-data="{
-            csNumbers: ['6281223660277', '6282118377317'],
+            csNumbers: ['6282119447179', '6287780250072'],
             get randomCs() { return this.csNumbers[Math.floor(Math.random() * this.csNumbers.length)]; }
         }">
             <p class="text-slate-500 text-xs mb-3">Butuh bantuan atau konfirmasi manual?</p>
